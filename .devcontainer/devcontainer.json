@@ -1,0 +1,35 @@
+{
+    "name": "ROS Humble Dev Container",
+    "image": "osrf/ros:humble-desktop-full", // <-- Make sure this is correct
+
+    // Add these runArgs for GUI forwarding
+    "runArgs": [
+        "--network=host",
+        "--privileged",
+        "--volume=/tmp/.X11-unix:/tmp/.X11-unix", // Mount X11 socket
+       // Optional: Mount your ROS workspace if needed later
+       // "--volume=${localWorkspaceFolder}:/workspaces/${localWorkspaceFolderBasename}",
+       // "--workdir=/workspaces/${localWorkspaceFolderBasename}"
+    ],
+
+    // Set the DISPLAY environment variable
+    "containerEnv": {
+        "DISPLAY": "${localEnv:DISPLAY}"
+    },
+
+    // Keep the container running even if VS Code closes
+    "shutdownAction": "stopContainer",
+
+    // Add ROS specific VS Code extensions if you like
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-iot.vscode-ros",
+                "ms-python.python"
+            ]
+        }
+    },
+
+   // Ensures terminal uses bash and sources ROS setup
+   "postCreateCommand": "echo 'source /opt/ros/humble/setup.bash' >> ~/.bashrc"
+}
