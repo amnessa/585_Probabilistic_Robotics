@@ -3,58 +3,41 @@
   <world name="demo">
     <gravity>0 0 -9.8</gravity>
 
-    <!-- Sun (world light) -->
-    <light name="sun" type="directional" cast_shadows="true">
+    <!-- Sun -->
+    <light name="sun" type="directional">
       <pose>0 0 10 0 0 0</pose>
       <diffuse>1 1 1 1</diffuse>
       <specular>0.1 0.1 0.1 1</specular>
-      <attenuation>
-        <range>1000</range>
-        <constant>0.9</constant>
-        <linear>0.01</linear>
-        <quadratic>0.001</quadratic>
-      </attenuation>
       <direction>-0.5 0.5 -1</direction>
     </light>
 
-    <!-- Ground plane (inline, no external model needed) -->
+    <!-- Flat ground -->
     <model name="ground_plane">
       <static>true</static>
       <link name="link">
         <collision name="collision">
-          <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>200 200</size>
-            </plane>
-          </geometry>
+          <geometry><plane><normal>0 0 1</normal><size>200 200</size></plane></geometry>
         </collision>
         <visual name="visual">
-          <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>200 200</size>
-            </plane>
-          </geometry>
-          <material>
-            <ambient>0.4 0.4 0.4 1</ambient>
-            <diffuse>0.6 0.6 0.6 1</diffuse>
-          </material>
+          <geometry><plane><normal>0 0 1</normal><size>200 200</size></plane></geometry>
+          <material><diffuse>0.6 0.6 0.6 1</diffuse></material>
         </visual>
       </link>
     </model>
 
-    <!-- Vehicles from your local models dir -->
+    <!-- Vehicles -->
     <include>
-      <uri>model://vehicle</uri>
+      <uri>model://vehicle_blue</uri>
       <name>vehicle_blue</name>
-      <pose>0 2 0 0 0 0</pose>
+      <!-- lift Z so wheels clear ground -->
+      <pose>0 2 0.25 0 0 0</pose>
     </include>
 
     <include>
-      <uri>model://vehicle</uri>
+      <uri>model://vehicle_green</uri>
       <name>vehicle_green</name>
-      <pose>0 -2 0 0 0 0</pose>
+      <!-- lift Z so wheels clear ground -->
+      <pose>0 -2 0.25 0 0 0</pose>
     </include>
   </world>
 </sdf>
