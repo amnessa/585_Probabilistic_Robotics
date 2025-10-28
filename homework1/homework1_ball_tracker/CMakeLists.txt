@@ -16,21 +16,15 @@ include_directories(include)
 
 # Add the camera tracker node
 add_executable(camera_tracker_node src/camera_tracker_node.cpp)
+ament_target_dependencies(camera_tracker_node rclcpp sensor_msgs geometry_msgs cv_bridge image_geometry message_filters OpenCV)
 
-# Link libraries
-ament_target_dependencies(camera_tracker_node
-  rclcpp
-  sensor_msgs
-  geometry_msgs
-  cv_bridge
-  OpenCV
-  image_geometry
-  message_filters
-)
+add_executable(green_follower_node src/green_follower_node.cpp)
+ament_target_dependencies(green_follower_node rclcpp geometry_msgs)
 
 # Install the executable
 install(TARGETS
   camera_tracker_node
+  green_follower_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

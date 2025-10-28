@@ -22,6 +22,13 @@ def generate_launch_description():
         '/model/vehicle_green/cmd_vel@geometry_msgs/msg/Twist@ignition.msgs.Twist',
         '/model/vehicle_blue/odometry@nav_msgs/msg/Odometry@ignition.msgs.Odometry',
         '/model/vehicle_green/odometry@nav_msgs/msg/Odometry@ignition.msgs.Odometry',
+
+        # RGBD camera on vehicle_green (ROS <-> Ign)
+        '/camera/image@sensor_msgs/msg/Image@ignition.msgs.Image',
+        '/camera/depth_image@sensor_msgs/msg/Image@ignition.msgs.Image',
+        '/camera/camera_info@sensor_msgs/msg/CameraInfo@ignition.msgs.CameraInfo',
+        # Optional: point cloud if you enable it later
+        # '/camera/points@sensor_msgs/msg/PointCloud2@ignition.msgs.PointCloudPacked',
     ]
     bridge = Node(package='ros_gz_bridge', executable='parameter_bridge',
                   arguments=bridge_args, output='screen')
