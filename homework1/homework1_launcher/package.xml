@@ -14,8 +14,6 @@
   <exec_depend>tf2_ros</exec_depend>
 
   <export>
-    <!-- Helps classic Gazebo; harmless for GZ Sim -->
-    <gazebo_ros gazebo_model_path="${prefix}/models"/>
-    <gazebo_ros gazebo_media_path="${prefix}/models"/>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>
