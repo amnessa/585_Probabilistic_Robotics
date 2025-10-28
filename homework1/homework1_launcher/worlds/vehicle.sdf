@@ -61,7 +61,39 @@
       <self_collide>true</self_collide>
       <pose>0 0 0 0 0 0</pose>
       <include merge="true">
-        <uri>package://ros_gz_sim_demos/models/vehicle</uri>
+        <uri>package://homework1_launcher/models/vehicle</uri>
+        <name>vehicle_blue</name>
+      </include>
+
+      <plugin
+        filename="gz-sim-joint-state-publisher-system"
+        name="gz::sim::systems::JointStatePublisher">
+      </plugin>
+
+      <plugin
+        filename="gz-sim-pose-publisher-system"
+        name="gz::sim::systems::PosePublisher">
+        <publish_link_pose>true</publish_link_pose>
+        <use_pose_vector_msg>true</use_pose_vector_msg>
+        <static_publisher>true</static_publisher>
+        <static_update_frequency>1</static_update_frequency>
+      </plugin>
+
+      <plugin
+        filename="gz-sim-odometry-publisher-system"
+        name="gz::sim::systems::OdometryPublisher">
+        <odom_frame>vehicle/odom</odom_frame>
+        <robot_base_frame>vehicle</robot_base_frame>
+      </plugin>
+
+    </model>
+
+    <model name="vehicle">
+      <self_collide>true</self_collide>
+      <pose>2 0 0 0 0 0</pose>
+      <include merge="true">
+        <uri>package://homework1_launcher/models/vehicle</uri>
+        <name>vehicle_green</name>
       </include>
 
       <plugin

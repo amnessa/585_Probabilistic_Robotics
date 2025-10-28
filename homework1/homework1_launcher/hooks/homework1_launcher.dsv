@@ -1,3 +1,6 @@
-# Prepend share locations for worlds/models to GZ_SIM_RESOURCE_PATH
+# Gazebo Sim (gz)
 prepend-non-duplicate;GZ_SIM_RESOURCE_PATH;share/homework1_launcher/worlds
 prepend-non-duplicate;GZ_SIM_RESOURCE_PATH;share/homework1_launcher/models
+# Ignition Gazebo (Fortress)
+prepend-non-duplicate;IGN_GAZEBO_RESOURCE_PATH;share/homework1_launcher/worlds
+prepend-non-duplicate;IGN_GAZEBO_RESOURCE_PATH;share/homework1_launcher/models
