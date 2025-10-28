@@ -1,0 +1,5 @@
+min_area: 150
+ema_alpha: 0.35
+depth_median_window: 5
+depth_default: 0.8
+depth_scale: 0.001
