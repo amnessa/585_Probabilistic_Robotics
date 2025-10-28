@@ -13,7 +13,12 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}
 )
 
-# Environment hook so Gazebo finds worlds/models
+# Install package.xml so tooling can discover the package
+install(FILES package.xml
+  DESTINATION share/${PROJECT_NAME}
+)
+
+# Environment hook so GZ finds worlds/models
 ament_environment_hooks(${CMAKE_CURRENT_SOURCE_DIR}/hooks/${PROJECT_NAME}.dsv)
 
 ament_package()
