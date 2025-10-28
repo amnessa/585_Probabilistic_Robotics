@@ -58,6 +58,17 @@
             </clip>
           </camera>
         </sensor>
+
+        <!-- camera visual box -->
+        <visual name="camera_box_visual">
+          <pose>0.30 0 0.40 0 0 0</pose> <!-- match sensor pose -->
+          <geometry><box><size>0.06 0.04 0.04</size></box></geometry>
+          <material>
+            <ambient>0.02 0.02 0.02 1</ambient>
+            <diffuse>0.02 0.02 0.02 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
       </link>
 
       <link name='left_wheel'>

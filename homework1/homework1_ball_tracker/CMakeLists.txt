@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.8)
 project(homework1_ball_tracker)
 
 # Find dependencies
@@ -16,7 +16,8 @@ include_directories(include)
 
 # Add the camera tracker node
 add_executable(camera_tracker_node src/camera_tracker_node.cpp)
-ament_target_dependencies(camera_tracker_node rclcpp sensor_msgs geometry_msgs cv_bridge image_geometry message_filters OpenCV)
+ament_target_dependencies(camera_tracker_node
+  rclcpp sensor_msgs geometry_msgs cv_bridge image_geometry message_filters OpenCV)
 
 add_executable(green_follower_node src/green_follower_node.cpp)
 ament_target_dependencies(green_follower_node rclcpp geometry_msgs)
@@ -25,22 +26,14 @@ ament_target_dependencies(green_follower_node rclcpp geometry_msgs)
 install(TARGETS
   camera_tracker_node
   green_follower_node
-  DESTINATION lib/${PROJECT_NAME}
-)
+  DESTINATION lib/${PROJECT_NAME})
 
-# Install launch files
-install(DIRECTORY launch
-  DESTINATION share/${PROJECT_NAME}
-)
+# Install launch, rviz, config
+install(DIRECTORY launch rviz config
+  DESTINATION share/${PROJECT_NAME})
 
-# Install configuration files
-install(DIRECTORY config
-  DESTINATION share/${PROJECT_NAME}
-)
-
-# Install RViz configuration files
-install(DIRECTORY rviz
-  DESTINATION share/${PROJECT_NAME}
-)
+# Register package in ament index
+install(DIRECTORY resource
+  DESTINATION share)
 
 ament_package()

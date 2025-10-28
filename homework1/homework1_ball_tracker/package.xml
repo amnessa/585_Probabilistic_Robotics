@@ -1,27 +1,17 @@
-<package format="2">
+<?xml version="1.0"?>
+<package format="3">
   <name>homework1_ball_tracker</name>
-  <version>0.1.0</version>
-  <description>A ROS2 package for tracking a ball using a camera stream and visualizing the results in RViz.</description>
-  <maintainer email="your_email@example.com">Your Name</maintainer>
+  <version>0.0.1</version>
+  <description>Camera-based robot tracker and follower</description>
+  <maintainer email="you@example.com">you</maintainer>
   <license>MIT</license>
-
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <build_depend>rclcpp</build_depend>
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>cv_bridge</build_depend>
-  <build_depend>opencv</build_depend>
-  <build_depend>image_geometry</build_depend>
-  <build_depend>message_filters</build_depend>
-
-  <exec_depend>rclcpp</exec_depend>
-  <exec_depend>sensor_msgs</exec_depend>
-  <exec_depend>geometry_msgs</exec_depend>
-  <exec_depend>cv_bridge</exec_depend>
-  <exec_depend>opencv</exec_depend>
-  <exec_depend>image_geometry</exec_depend>
-  <exec_depend>message_filters</exec_depend>
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_geometry</depend>
+  <depend>message_filters</depend>
   <exec_depend>image_view</exec_depend>
-
-  <test_depend>ament_cmake_gtest</test_depend>
+  <export/>
 </package>
