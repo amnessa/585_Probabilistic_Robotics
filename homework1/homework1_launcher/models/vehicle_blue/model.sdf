@@ -143,7 +143,7 @@
         <parent>chassis</parent>
         <child>left_wheel</child>
         <axis>
-          <xyz>0 0 1</xyz>
+          <xyz>0 1 0</xyz>  <!-- rotate around Y to roll forward -->
           <limit>
             <lower>-1.79769e+308</lower>
             <upper>1.79769e+308</upper>
@@ -155,7 +155,7 @@
         <parent>chassis</parent>
         <child>right_wheel</child>
         <axis>
-          <xyz>0 0 1</xyz>
+          <xyz>0 1 0</xyz>  <!-- rotate around Y to roll forward -->
           <limit>
             <lower>-1.79769e+308</lower>
             <upper>1.79769e+308</upper>
@@ -175,7 +175,8 @@
         <right_joint>right_wheel_joint</right_joint>
         <wheel_separation>1.25</wheel_separation>
         <wheel_radius>0.3</wheel_radius>
-        <odom_publish_frequency>1</odom_publish_frequency>
+        <topic>cmd_vel</topic>  <!-- be explicit -->
+        <odom_publish_frequency>30</odom_publish_frequency>
         <max_linear_acceleration>1</max_linear_acceleration>
         <min_linear_acceleration>-1</min_linear_acceleration>
         <max_angular_acceleration>2</max_angular_acceleration>

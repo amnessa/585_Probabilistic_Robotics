@@ -40,14 +40,14 @@
       <uri>model://vehicle_blue</uri>
       <name>vehicle_blue</name>
       <!-- lift Z so wheels clear ground -->
-      <pose>0 2 0.25 0 0 0</pose>
+      <pose>0 2 0.35 0 0 0</pose>
     </include>
 
     <include>
       <uri>model://vehicle_green</uri>
       <name>vehicle_green</name>
       <!-- lift Z so wheels clear ground -->
-      <pose>0 -2 0.25 0 0 0</pose>
+      <pose>0 -2 0.35 0 0 0</pose>
     </include>
   </world>
 </sdf>

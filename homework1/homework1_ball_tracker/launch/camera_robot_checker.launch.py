@@ -14,7 +14,7 @@ def generate_launch_description():
             executable='camera_tracker_node',
             name='camera_tracker_node',
             output='screen',
-            parameters=[params],
+            parameters=[params, {'use_sim_time': True}],
         ),
         Node(
             package='homework1_ball_tracker',
@@ -30,11 +30,13 @@ def generate_launch_description():
                 'max_ang': 1.2,
                 'search_omega': 0.6,
                 'lost_timeout': 0.5,
+                'use_sim_time': True,
             }],
             remappings=[
                 ('/cmd_vel_out', '/model/vehicle_green/cmd_vel'),
             ],
         ),
-        # Enable only if DISPLAY is available; otherwise RViz will crash in the container
-        # Node(package='rviz2', executable='rviz2', arguments=['-d', rviz_cfg]),
+        # Optionally launch RViz for debugging:
+        # Node(package='rviz2', executable='rviz2',
+        #      arguments=['-d', rviz_cfg], parameters=[{'use_sim_time': True}]),
     ])
