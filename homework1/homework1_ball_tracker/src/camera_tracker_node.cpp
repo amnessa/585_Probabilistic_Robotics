@@ -28,8 +28,8 @@ public:
     depth_scale_   = declare_parameter<double>("depth_scale", 0.001);
 
     // Subscriptions (sync only image + depth)
-    img_sub_.subscribe(this, "/camera/image", rmw_qos_profile_sensor_data);
-    depth_sub_.subscribe(this, "/camera/depth_image", rmw_qos_profile_sensor_data);
+    img_sub_.subscribe(this, "/camera/image", rmw_qos_profile_default);
+    depth_sub_.subscribe(this, "/camera/depth_image", rmw_qos_profile_default);
     // info_sub_.subscribe(this, "/camera/camera_info", rmw_qos_profile_sensor_data); // not needed
 
     sync_ = std::make_shared<Synchronizer>(SyncPolicy(10), img_sub_, depth_sub_);
