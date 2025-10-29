@@ -7,6 +7,8 @@
         "--network=host",
         "--privileged",
         "--volume=/tmp/.X11-unix:/tmp/.X11-unix", // Mount X11 socket
+        "--gpus=all",                              // Enable GPU support
+        "--volume=/usr/share/glvnd/egl_vendor.d:/usr/share/glvnd/egl_vendor.d:ro"
        // Optional: Mount your ROS workspace if needed later
        // "--volume=${localWorkspaceFolder}:/workspaces/${localWorkspaceFolderBasename}",
        // "--workdir=/workspaces/${localWorkspaceFolderBasename}"
@@ -14,7 +16,9 @@
 
     // Set the DISPLAY environment variable
     "containerEnv": {
-        "DISPLAY": "${localEnv:DISPLAY}"
+        "DISPLAY": "${localEnv:DISPLAY}",
+
+        "__GLX_VENDOR_LIBRARY_NAME": "nvidia"
     },
 
     // Keep the container running even if VS Code closes

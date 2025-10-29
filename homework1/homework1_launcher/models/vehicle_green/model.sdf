@@ -179,6 +179,8 @@
         <sensor name="rgbd_green" type="rgbd_camera">
           <update_rate>20</update_rate>
           <pose>0 0 0 0 0 0</pose>
+          <always_on>true</always_on>
+          <visualize>true</visualize>
           <camera>
             <horizontal_fov>1.05</horizontal_fov>
             <image>
