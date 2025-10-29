@@ -5,7 +5,9 @@
   <description>Camera-based robot tracker and follower</description>
   <maintainer email="you@example.com">you</maintainer>
   <license>MIT</license>
+
   <buildtool_depend>ament_cmake</buildtool_depend>
+
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
@@ -13,5 +15,8 @@
   <depend>image_geometry</depend>
   <depend>message_filters</depend>
   <exec_depend>image_view</exec_depend>
-  <export/>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>

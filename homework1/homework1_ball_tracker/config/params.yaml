@@ -1,10 +1,10 @@
 camera_tracker_node:
   ros__parameters:
-    hsv_lower: [0, 120, 70]     # example if you track a colored blob
-    hsv_upper: [10, 255, 255]
+    # HSV tuned for blue; adjust as needed
+    hsv_lower: [90, 80, 40]
+    hsv_upper: [130, 255, 255]
     min_area: 200
-min_area: 150
-ema_alpha: 0.35
-depth_median_window: 5
-depth_default: 0.8
-depth_scale: 0.001
+    ema_alpha: 0.35
+    depth_median_window: 5
+    depth_default: 0.8
+    depth_scale: 0.001

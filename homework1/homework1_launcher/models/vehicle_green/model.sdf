@@ -173,10 +173,10 @@
         </collision>
       </link>
 
-      <link name="camera_link_blue">
+      <link name="camera_link_green">
         <pose>0.3 0 0.4 0 0 0</pose>
         <inertial><mass>0.1</mass></inertial>
-        <sensor name="rgbd_blue" type="rgbd_camera">
+        <sensor name="rgbd_green" type="rgbd_camera">
           <update_rate>20</update_rate>
           <pose>0 0 0 0 0 0</pose>
           <camera>
@@ -191,7 +191,7 @@
               <far>10.0</far>
             </clip>
           </camera>
-          <topic>/gz/vehicle_blue/rgbd</topic>
+          <topic>/gz/vehicle_green/rgbd</topic>
         </sensor>
       </link>
 

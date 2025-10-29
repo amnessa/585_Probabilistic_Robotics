@@ -27,21 +27,22 @@ public:
     depth_default_ = declare_parameter<double>("depth_default", 0.8);
     depth_scale_   = declare_parameter<double>("depth_scale", 0.001);
 
+    // Subscriptions (sync only image + depth)
     img_sub_.subscribe(this, "/camera/image", rmw_qos_profile_sensor_data);
     depth_sub_.subscribe(this, "/camera/depth_image", rmw_qos_profile_sensor_data);
-    info_sub_.subscribe(this, "/camera/camera_info", rmw_qos_profile_sensor_data);
+    // info_sub_.subscribe(this, "/camera/camera_info", rmw_qos_profile_sensor_data); // not needed
 
-    sync_ = std::make_shared<Synchronizer>(SyncPolicy(10), img_sub_, depth_sub_, info_sub_);
+    sync_ = std::make_shared<Synchronizer>(SyncPolicy(10), img_sub_, depth_sub_);
     sync_->registerCallback(std::bind(&CameraTrackerNode::cb, this,
-                                      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+                                      std::placeholders::_1, std::placeholders::_2));
 
     pub_ = create_publisher<Point>("/target_pixel_coords", 10);
   }
 
 private:
+  // Updated callback: remove CameraInfo arg (unused)
   void cb(const Image::ConstSharedPtr &img_msg,
-          const Image::ConstSharedPtr &depth_msg,
-          const CameraInfo::ConstSharedPtr &) {
+          const Image::ConstSharedPtr &depth_msg) {
     cv::Mat bgr;
     try { bgr = cv_bridge::toCvShare(img_msg, "bgr8")->image; }
     catch (const cv_bridge::Exception &e) {
@@ -113,14 +114,13 @@ private:
     pub_->publish(out);
   }
 
-  // params (use int64 for ROS parameter arrays)
+  // params and members
   std::vector<int64_t> hsv_lower_, hsv_upper_;
   int min_area_{200}, depth_win_{5};
   double ema_alpha_{0.35}, depth_default_{0.8}, depth_scale_{0.001};
 
   message_filters::Subscriber<Image> img_sub_, depth_sub_;
-  message_filters::Subscriber<CameraInfo> info_sub_;
-  using SyncPolicy = message_filters::sync_policies::ApproximateTime<Image, Image, CameraInfo>;
+  using SyncPolicy = message_filters::sync_policies::ApproximateTime<Image, Image>;
   using Synchronizer = message_filters::Synchronizer<SyncPolicy>;
   std::shared_ptr<Synchronizer> sync_;
 

@@ -137,27 +137,7 @@
         </collision>
       </link>
 
-      <link name="camera_link_blue">
-        <pose>0.3 0 0.4 0 0 0</pose>
-        <inertial><mass>0.1</mass></inertial>
-        <sensor name="rgbd_blue" type="rgbd_camera">
-          <update_rate>20</update_rate>
-          <pose>0 0 0 0 0 0</pose>
-          <camera>
-            <horizontal_fov>1.05</horizontal_fov>
-            <image>
-              <width>640</width>
-              <height>480</height>
-              <format>R8G8B8</format>
-            </image>
-            <clip>
-              <near>0.05</near>
-              <far>10.0</far>
-            </clip>
-          </camera>
-          <topic>/gz/vehicle_blue/rgbd</topic>
-        </sensor>
-      </link>
+
 
       <joint name='left_wheel_joint' type='revolute'>
         <parent>chassis</parent>
