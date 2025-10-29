@@ -191,7 +191,7 @@
               <far>10.0</far>
             </clip>
           </camera>
-          <topic>/gz/vehicle_green/rgbd</topic>
+          <topic>/camera</topic>
         </sensor>
       </link>
 
