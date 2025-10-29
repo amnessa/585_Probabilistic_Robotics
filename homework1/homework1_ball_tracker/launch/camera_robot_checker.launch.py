@@ -16,7 +16,6 @@ def generate_launch_description():
             output='screen',
             parameters=[params],
         ),
-
         Node(
             package='homework1_ball_tracker',
             executable='green_follower_node',
@@ -33,16 +32,9 @@ def generate_launch_description():
                 'lost_timeout': 0.5,
             }],
             remappings=[
-                ('/target_pixel_coords', '/target_pixel_coords'),
                 ('/cmd_vel_out', '/model/vehicle_green/cmd_vel'),
             ],
         ),
-
-        Node(
-            package='rviz2',
-            executable='rviz2',
-            name='rviz2',
-            output='screen',
-            arguments=['-d', rviz_cfg],
-        ),
+        # Enable only if DISPLAY is available; otherwise RViz will crash in the container
+        # Node(package='rviz2', executable='rviz2', arguments=['-d', rviz_cfg]),
     ])

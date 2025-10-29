@@ -7,9 +7,9 @@
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
-#include <algorithm>   // added
-#include <limits>      // added
-#include <cstdint>     // added
+#include <algorithm>
+#include <limits>
+#include <cstdint>
 
 using sensor_msgs::msg::Image;
 using sensor_msgs::msg::CameraInfo;
@@ -43,57 +43,47 @@ private:
           const Image::ConstSharedPtr &depth_msg,
           const CameraInfo::ConstSharedPtr &) {
     cv::Mat bgr;
-    try {
-      bgr = cv_bridge::toCvShare(img_msg, "bgr8")->image;
-    } catch (const cv_bridge::Exception &e) {
-      RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 2000, "cv_bridge img: %s", e.what());
+    try { bgr = cv_bridge::toCvShare(img_msg, "bgr8")->image; }
+    catch (const cv_bridge::Exception &e) {
+      RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 2000, "cv img: %s", e.what());
       return;
     }
 
     cv::Mat depth;
     try {
-      if (depth_msg->encoding == "16UC1") {
-        depth = cv_bridge::toCvShare(depth_msg, "16UC1")->image;
-      } else {
-        depth = cv_bridge::toCvShare(depth_msg, "32FC1")->image;
-      }
+      if (depth_msg->encoding == "16UC1") depth = cv_bridge::toCvShare(depth_msg, "16UC1")->image;
+      else depth = cv_bridge::toCvShare(depth_msg, "32FC1")->image;
     } catch (const cv_bridge::Exception &e) {
-      RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 2000, "cv_bridge depth: %s", e.what());
+      RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 2000, "cv depth: %s", e.what());
       return;
     }
 
-    // Segment blue
     cv::Mat hsv, mask;
     cv::cvtColor(bgr, hsv, cv::COLOR_BGR2HSV);
-    const cv::Scalar lo(static_cast<int>(hsv_lower_[0]),
-                        static_cast<int>(hsv_lower_[1]),
-                        static_cast<int>(hsv_lower_[2]));
-    const cv::Scalar hi(static_cast<int>(hsv_upper_[0]),
-                        static_cast<int>(hsv_upper_[1]),
-                        static_cast<int>(hsv_upper_[2]));
+    const cv::Scalar lo((int)hsv_lower_[0], (int)hsv_lower_[1], (int)hsv_lower_[2]);
+    const cv::Scalar hi((int)hsv_upper_[0], (int)hsv_upper_[1], (int)hsv_upper_[2]);
     cv::inRange(hsv, lo, hi, mask);
     cv::erode(mask, mask, cv::Mat(), cv::Point(-1,-1), 1);
     cv::dilate(mask, mask, cv::Mat(), cv::Point(-1,-1), 2);
 
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-
     if (contours.empty()) { have_px_ = false; return; }
 
     size_t best_i = 0; double best_area = 0.0;
     for (size_t i = 0; i < contours.size(); ++i) {
-      const double a = cv::contourArea(contours[i]);
+      double a = cv::contourArea(contours[i]);
       if (a > best_area) { best_area = a; best_i = i; }
     }
-    if (best_area < static_cast<double>(min_area_)) { have_px_ = false; return; }
+    if (best_area < (double)min_area_) { have_px_ = false; return; }
 
     cv::Moments m = cv::moments(contours[best_i]);
     double cx = (m.m00 > 1e-6) ? (m.m10 / m.m00) : (bgr.cols * 0.5);
     double cy = (m.m00 > 1e-6) ? (m.m01 / m.m00) : (bgr.rows * 0.5);
 
     const int w = std::max(1, depth_win_);
-    const int x0 = std::clamp(static_cast<int>(std::round(cx)) - w/2, 0, depth.cols - 1);
-    const int y0 = std::clamp(static_cast<int>(std::round(cy)) - w/2, 0, depth.rows - 1);
+    const int x0 = std::clamp((int)std::round(cx) - w/2, 0, depth.cols - 1);
+    const int y0 = std::clamp((int)std::round(cy) - w/2, 0, depth.rows - 1);
     const int x1 = std::clamp(x0 + w, 0, depth.cols);
     const int y1 = std::clamp(y0 + w, 0, depth.rows);
 
@@ -103,7 +93,7 @@ private:
         float d_m = std::numeric_limits<float>::quiet_NaN();
         if (depth_msg->encoding == "16UC1") {
           uint16_t raw = depth.at<uint16_t>(y, x);
-          if (raw > 0) d_m = static_cast<float>(raw) * static_cast<float>(depth_scale_);
+          if (raw > 0) d_m = (float)raw * (float)depth_scale_;
         } else {
           float raw = depth.at<float>(y, x);
           if (std::isfinite(raw) && raw > 0.0f) d_m = raw;
@@ -118,10 +108,7 @@ private:
       if (have_px_) d = ema_alpha_ * d + (1.0 - ema_alpha_) * last_depth_;
     }
 
-    last_px_ = {cx, cy, d};
-    last_depth_ = d;
-    have_px_ = true;
-
+    last_depth_ = d; have_px_ = true;
     Point out; out.x = cx; out.y = cy; out.z = d;
     pub_->publish(out);
   }
@@ -138,10 +125,8 @@ private:
   std::shared_ptr<Synchronizer> sync_;
 
   rclcpp::Publisher<Point>::SharedPtr pub_;
-
   bool have_px_{false};
   double last_depth_{0.8};
-  struct { double x, y, z; } last_px_;
 };
 
 int main(int argc, char** argv) {

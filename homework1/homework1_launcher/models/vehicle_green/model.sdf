@@ -61,8 +61,8 @@
 
         <!-- camera visual box -->
         <visual name="camera_box_visual">
-          <pose>0.30 0 0.40 0 0 0</pose> <!-- match sensor pose -->
-          <geometry><box><size>0.06 0.04 0.04</size></box></geometry>
+          <pose>0.30 0 0.40 0 0 0</pose>
+          <geometry><box><size>0.30 0.20 0.20</size></box></geometry> <!-- 5x -->
           <material>
             <ambient>0.02 0.02 0.02 1</ambient>
             <diffuse>0.02 0.02 0.02 1</diffuse>

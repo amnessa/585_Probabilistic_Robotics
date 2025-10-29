@@ -34,7 +34,7 @@ private:
     const bool fresh = have_target_ && (now() - last_stamp_).seconds() <= lost_timeout_;
 
     if (!fresh) {
-      cmd.angular.z = search_omega_;
+      cmd.angular.z = search_omega_;  // rotate to search
       cmd.linear.x = 0.0;
       pub_->publish(cmd);
       return;

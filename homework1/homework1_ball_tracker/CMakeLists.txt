@@ -28,12 +28,16 @@ install(TARGETS
   green_follower_node
   DESTINATION lib/${PROJECT_NAME})
 
-# Install launch, rviz, config
+# Install runtime data
 install(DIRECTORY launch rviz config
   DESTINATION share/${PROJECT_NAME})
 
-# Register package in ament index
-install(DIRECTORY resource
-  DESTINATION share)
+# Register this package in the ament index (this fixes “Package not found”)
+install(FILES resource/${PROJECT_NAME}
+  DESTINATION share/ament_index/resource_index/packages)
+
+# Good practice: install package.xml too
+install(FILES package.xml
+  DESTINATION share/${PROJECT_NAME})
 
 ament_package()
