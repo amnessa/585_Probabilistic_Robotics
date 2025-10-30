@@ -71,20 +71,39 @@ def generate_launch_description():
                     arguments=['0', '-2', '0', '0', '0', '0', 'world', 'vehicle_green/odom'],
                     output='screen')
 
-        # Static TF for sensor frames (Gazebo publishes link frames, not sensor frames)
+    # chassis -> lidar_link (matches SDF pose 0.6 0 0.6)
+    lidar_mount_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['0.6','0','0.6','0','0','0',
+                   'vehicle_blue/chassis','vehicle_blue/lidar_link'],
+        output='screen'
+    )
+    # lidar_link -> gpu_lidar (identity; matches LaserScan header.frame_id)
     lidar_tf = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         arguments=['0','0','0','0','0','0',
-                   'vehicle_blue/lidar_link', 'vehicle_blue/lidar_link/gpu_lidar'],
+                   'vehicle_blue/lidar_link','vehicle_blue/lidar_link/gpu_lidar'],
         output='screen'
     )
+
+    # chassis -> imu_link (matches SDF pose 0 0 0.3)
+    imu_mount_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['0','0','0.3','0','0','0',
+                   'vehicle_blue/chassis','vehicle_blue/imu_link'],
+        output='screen'
+    )
+    # imu_link -> imu_sensor (identity)
     imu_tf = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         arguments=['0','0','0','0','0','0',
-                   'vehicle_blue/imu_link', 'vehicle_blue/imu_link/imu_sensor'],
+                   'vehicle_blue/imu_link','vehicle_blue/imu_link/imu_sensor'],
         output='screen'
     )
 
-    return LaunchDescription([gz, bridge, tf_blue, tf_green, cam_tf, rviz, lidar_tf, imu_tf])
+    return LaunchDescription([gz, bridge, tf_blue, tf_green, cam_tf, rviz,
+                              lidar_mount_tf, lidar_tf, imu_mount_tf, imu_tf])
