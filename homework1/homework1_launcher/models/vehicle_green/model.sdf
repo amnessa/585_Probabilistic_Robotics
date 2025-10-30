@@ -183,7 +183,7 @@
         <parent>chassis</parent>
         <child>left_wheel</child>
         <axis>
-          <xyz>0 1 0</xyz>
+          <xyz>0 0 1</xyz>
           <limit>
             <lower>-1.79769e+308</lower>
             <upper>1.79769e+308</upper>
@@ -195,7 +195,7 @@
         <parent>chassis</parent>
         <child>right_wheel</child>
         <axis>
-          <xyz>0 1 0</xyz>
+          <xyz>0 0 1</xyz>
           <limit>
             <lower>-1.79769e+308</lower>
             <upper>1.79769e+308</upper>
