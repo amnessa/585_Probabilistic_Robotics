@@ -1,6 +1,11 @@
 <?xml version="1.0" ?>
 <sdf version="1.7">
   <world name="demo">
+    <!-- When we declare sytem here this outomatically overrides the default so everything else gets disabled -->
+  <!-- Ensure the physics system is loaded -->
+  <plugin filename="ignition-gazebo-physics-system"
+          name="ignition::gazebo::systems::Physics">
+  </plugin>
   <!-- Ensure the sensors system is loaded -->
   <plugin filename="ignition-gazebo-sensors-system"
           name="ignition::gazebo::systems::Sensors">
