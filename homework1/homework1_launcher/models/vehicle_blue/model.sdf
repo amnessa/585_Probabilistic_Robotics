@@ -103,7 +103,7 @@
         <sensor name="imu_sensor" type="imu">
           <topic>/imu</topic>
           <update_rate>20</update_rate>
-          <visualize>false</visualize>
+          <always_on>true</always_on>
         </sensor>
       </link>
 

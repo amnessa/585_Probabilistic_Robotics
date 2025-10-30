@@ -87,4 +87,4 @@ def generate_launch_description():
         output='screen'
     )
 
-    return LaunchDescription([gz, bridge, cam_tf, rviz, tf_blue, tf_green, lidar_tf, imu_tf])
+    return LaunchDescription([gz, bridge, tf_blue, tf_green, cam_tf, rviz, lidar_tf, imu_tf])
