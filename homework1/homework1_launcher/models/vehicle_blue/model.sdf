@@ -35,6 +35,78 @@
         </collision>
       </link>
 
+      <link name='lidar_link'>
+        <pose>0.6 0 0.6 0 0 0</pose>
+        <inertial>
+          <mass>0.1</mass>
+          <inertia>
+            <ixx>0.0001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0001</iyy>
+            <iyz>0</iyz>
+            <izz>0.0001</izz>
+          </inertia>
+        </inertial>
+
+        <visual name='lidar_visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>0.3</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0.1 0.1 0.1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+
+        <sensor name="gpu_lidar" type="gpu_lidar">
+          <topic>/lidar</topic>
+          <update_rate>10</update_rate>
+          <visualize>true</visualize>
+          <lidar>
+            <scan>
+              <horizontal>
+                <samples>360</samples> <resolution>1</resolution> <min_angle>-3.14159</min_angle>
+                <max_angle>3.14159</max_angle>
+              </horizontal>
+            </scan>
+            <range>
+              <min>0.2</min>    <max>12.0</max>   <resolution>0.01</resolution>
+            </range>
+            <noise>
+              <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.01</stddev>
+            </noise>
+          </lidar>
+        </sensor>
+      </link>
+
+      <link name='imu_link'>
+        <pose>0 0 0.3 0 0 0</pose>
+        <inertial>
+          <mass>0.01</mass>
+          <inertia>
+            <ixx>1.6e-6</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1.6e-6</iyy>
+            <iyz>0</iyz>
+            <izz>1.6e-6</izz>
+          </inertia>
+        </inertial>
+
+        <sensor name="imu_sensor" type="imu">
+          <topic>/imu</topic>
+          <update_rate>20</update_rate>
+          <visualize>false</visualize>
+        </sensor>
+      </link>
+
       <link name='left_wheel'>
         <pose>0.554283 0.625029 -0.025 -1.5707 0 0</pose>
         <inertial>
@@ -137,7 +209,15 @@
         </collision>
       </link>
 
+      <joint name='lidar_joint' type='fixed'>
+        <parent>chassis</parent>
+        <child>lidar_link</child>
+      </joint>
 
+      <joint name='imu_joint' type='fixed'>
+        <parent>chassis</parent>
+        <child>imu_link</child>
+      </joint>
 
       <joint name='left_wheel_joint' type='revolute'>
         <parent>chassis</parent>

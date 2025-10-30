@@ -26,10 +26,14 @@ def generate_launch_description():
         '/camera/depth_image@sensor_msgs/msg/Image@ignition.msgs.Image',
         '/camera/camera_info@sensor_msgs/msg/CameraInfo@ignition.msgs.CameraInfo',
 
-        # TF and simulation clock (GZ -> ROS)
-        '/model/vehicle_green/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V',
-        '/model/vehicle_blue/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V',
-        '/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
+        # Lidar + IMU on blue robot (GZ -> ROS) - CORRECTED SYNTAX
+        '/lidar@sensor_msgs/msg/LaserScan@ignition.msgs.LaserScan',
+        '/imu@sensor_msgs/msg/Imu@ignition.msgs.IMU',
+
+        # TF and simulation clock (GZ -> ROS) - CORRECTED SYNTAX
+        '/model/vehicle_green/tf@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
+        '/model/vehicle_blue/tf@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
+        '/clock@rosgraph_msgs/msg/Clock@ignition.msgs.Clock',
     ]
     bridge = Node(
         package='ros_gz_bridge',
@@ -67,4 +71,20 @@ def generate_launch_description():
                     arguments=['0', '-2', '0', '0', '0', '0', 'world', 'vehicle_green/odom'],
                     output='screen')
 
-    return LaunchDescription([gz, bridge, cam_tf, rviz, tf_blue, tf_green])
+        # Static TF for sensor frames (Gazebo publishes link frames, not sensor frames)
+    lidar_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['0','0','0','0','0','0',
+                   'vehicle_blue/lidar_link', 'vehicle_blue/lidar_link/gpu_lidar'],
+        output='screen'
+    )
+    imu_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['0','0','0','0','0','0',
+                   'vehicle_blue/imu_link', 'vehicle_blue/imu_link/imu_sensor'],
+        output='screen'
+    )
+
+    return LaunchDescription([gz, bridge, cam_tf, rviz, tf_blue, tf_green, lidar_tf, imu_tf])
