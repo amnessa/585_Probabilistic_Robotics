@@ -80,7 +80,7 @@
             <noise>
               <type>gaussian</type>
               <mean>0.0</mean>
-              <stddev>0.01</stddev>
+              <stddev>0.02</stddev>
             </noise>
           </lidar>
         </sensor>
@@ -104,6 +104,49 @@
           <topic>/imu</topic>
           <update_rate>20</update_rate>
           <always_on>true</always_on>
+          <visualize>true</visualize>
+          <imu>
+              <angular_velocity>
+                <x>
+                  <noise type='gaussian'>
+                    <mean>0.0</mean>
+                    <stddev>0.005</stddev>
+                  </noise>
+                </x>
+                <y>
+                  <noise type='gaussian'>
+                    <mean>0.0</mean>
+                    <stddev>0.005</stddev>
+                  </noise>
+                </y>
+                <z>
+                  <noise type='gaussian'>
+                    <mean>0.0</mean>
+                    <stddev>0.005</stddev>
+                  </noise>
+                </z>
+              </angular_velocity>
+              <linear_acceleration>
+                <x>
+                  <noise type='gaussian'>
+                    <mean>0.0</mean>
+                    <stddev>0.01</stddev>
+                  </noise>
+                </x>
+                <y>
+                  <noise type='gaussian'>
+                    <mean>0.0</mean>
+                    <stddev>0.01</stddev>
+                  </noise>
+                </y>
+                <z>
+                  <noise type='gaussian'>
+                    <mean>0.0</mean>
+                    <stddev>0.01</stddev>
+                  </noise>
+                </z>
+              </linear_acceleration>
+          </imu>
         </sensor>
       </link>
 
@@ -138,6 +181,18 @@
               <radius>0.3</radius>
             </sphere>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>   <mu2>0.8</mu2>  <slip1>0.05</slip1> <slip2>0.05</slip2> </ode>
+            </friction>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <kp>1e8</kp>
+              </ode>
+            </contact>
+        </surface>
         </collision>
       </link>
 
@@ -172,6 +227,18 @@
               <radius>0.3</radius>
             </sphere>
           </geometry>
+            <surface>
+              <friction>
+                <ode>
+                  <mu>1.0</mu>   <mu2>0.8</mu2>  <slip1>0.05</slip1> <slip2>0.05</slip2> </ode>
+              </friction>
+              <contact>
+                <ode>
+                  <min_depth>0.001</min_depth>
+                  <kp>1e8</kp>
+                </ode>
+              </contact>
+            </surface>
         </collision>
       </link>
 
@@ -251,6 +318,8 @@
       <plugin
         filename="ignition-gazebo-diff-drive-system"
         name="ignition::gazebo::systems::DiffDrive">
+        <odom_noise_xyz>0.001 0.001 0.001</odom_noise_xyz>
+        <odom_noise_rpy>0.001 0.001 0.001</odom_noise_rpy>
         <left_joint>left_wheel_joint</left_joint>
         <right_joint>right_wheel_joint</right_joint>
         <wheel_separation>1.25</wheel_separation>

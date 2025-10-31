@@ -56,6 +56,11 @@
               <near>0.1</near>
               <far>15.0</far>
             </clip>
+            <noise>
+              <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.007</stddev>
+            </noise>
           </camera>
         </sensor>
 
@@ -102,6 +107,18 @@
               <radius>0.3</radius>
             </sphere>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>   <mu2>0.8</mu2>  <slip1>0.05</slip1> <slip2>0.05</slip2> </ode>
+            </friction>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <kp>1e8</kp>
+              </ode>
+            </contact>
+          </surface>
         </collision>
       </link>
 
@@ -136,6 +153,18 @@
               <radius>0.3</radius>
             </sphere>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>   <mu2>0.8</mu2>  <slip1>0.05</slip1> <slip2>0.05</slip2> </ode>
+            </friction>
+            <contact>
+              <ode>
+                <min_depth>0.001</min_depth>
+                <kp>1e8</kp>
+              </ode>
+            </contact>
+          </surface>
         </collision>
       </link>
 
@@ -211,6 +240,8 @@
       <plugin
         filename="ignition-gazebo-diff-drive-system"
         name="ignition::gazebo::systems::DiffDrive">
+        <odom_noise_xyz>0.001 0.001 0.001</odom_noise_xyz>
+        <odom_noise_rpy>0.001 0.001 0.001</odom_noise_rpy>
         <left_joint>left_wheel_joint</left_joint>
         <right_joint>right_wheel_joint</right_joint>
         <wheel_separation>1.25</wheel_separation>
