@@ -37,7 +37,7 @@
         <!-- RGB-D camera mounted on the chassis -->
         <sensor name="rgbd" type="rgbd_camera">
           <!-- x forward, raise a bit -->
-          <pose>0.30 0 0.40 0 0 0</pose>
+          <pose>0.85 0 0.40 0 0 0</pose>
           <always_on>true</always_on>
           <update_rate>20</update_rate>
           <visualize>true</visualize>
@@ -66,7 +66,7 @@
 
         <!-- camera visual box -->
         <visual name="camera_box_visual">
-          <pose>0.30 0 0.40 0 0 0</pose>
+          <pose>0.85 0 0.40 0 0 0</pose>
           <geometry><box><size>0.30 0.20 0.20</size></box></geometry> <!-- 5x -->
           <material>
             <ambient>0.02 0.02 0.02 1</ambient>

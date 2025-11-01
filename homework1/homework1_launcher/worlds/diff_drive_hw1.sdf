@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <sdf version="1.7">
   <world name="demo">
-    <!-- When we declare sytem here this outomatically overrides the default so everything else gets disabled -->
+    <!-- When we declare sytem here this automatically overrides the default so everything else gets disabled -->
   <!-- Ensure the physics system is loaded -->
   <plugin filename="ignition-gazebo-physics-system"
           name="ignition::gazebo::systems::Physics">
@@ -9,16 +9,17 @@
   <!-- Ensure the sensors system is loaded -->
   <plugin filename="libignition-gazebo-sensors-system.so"
           name="ignition::gazebo::systems::Sensors">
-    <render_engine>ogre2</render_engine>  <!-- Fortress default; works with EGL/headless -->
+    <render_engine>ogre2</render_engine>
   </plugin>
 
   <plugin filename="libignition-gazebo-imu-system.so"
         name="ignition::gazebo::systems::Imu">
   </plugin>
 
-  <!-- (optional but common) -->
   <plugin filename="ignition-gazebo-scene-broadcaster-system"
           name="ignition::gazebo::systems::SceneBroadcaster"/>
+  <plugin filename="ignition-gazebo-user-commands-system"
+          name="ignition::gazebo::systems::UserCommands"/>
 
     <gravity>0 0 -9.8</gravity>
 
