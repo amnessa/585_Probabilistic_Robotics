@@ -60,12 +60,17 @@
       <pose>0 -2 0.35 0 0 0</pose>
     </include>
 
-    <!-- Room walls (10x10m, 1.5m high, 0.2m thick) -->
-    <!-- North wall split to leave a 1.0m door gap at x=0 -->
-    <model name="wall_north_left">
-      <static>true</static>
-      <pose>-2.75 5 0.75 0 0 0</pose>
-      <link name="link">
+  </world>
+</sdf>
+<!-- BELOW THIS LINE IT IS EXAMPLE 4 WALLS AND A DOOR WITH HINGE ENVIRONMENT add it under <world> -->
+
+
+      <!-- Room walls (10x10m, 1.5m high, 0.2m thick) -->
+      <!-- North wall split to leave a 1.0m door gap at x=0 -->
+      <model name="wall_north_left">
+        <static>true</static>
+        <pose>-2.75 5 0.75 0 0 0</pose>
+        <link name="link">
         <collision name="collision">
           <geometry><box><size>4.5 0.2 1.5</size></box></geometry>
         </collision>
@@ -73,13 +78,13 @@
           <geometry><box><size>4.5 0.2 1.5</size></box></geometry>
           <material><diffuse>0.5 0.5 0.5 1</diffuse></material>
         </visual>
-      </link>
-    </model>
+        </link>
+      </model>
 
-    <model name="wall_north_right">
-      <static>true</static>
-      <pose>2.75 5 0.75 0 0 0</pose>
-      <link name="link">
+      <model name="wall_north_right">
+        <static>true</static>
+        <pose>2.75 5 0.75 0 0 0</pose>
+        <link name="link">
         <collision name="collision">
           <geometry><box><size>4.5 0.2 1.5</size></box></geometry>
         </collision>
@@ -87,13 +92,13 @@
           <geometry><box><size>4.5 0.2 1.5</size></box></geometry>
           <material><diffuse>0.5 0.5 0.5 1</diffuse></material>
         </visual>
-      </link>
-    </model>
+        </link>
+      </model>
 
-    <model name="wall_south">
-      <static>true</static>
-      <pose>0 -5 0.75 0 0 0</pose>
-      <link name="link">
+      <model name="wall_south">
+        <static>true</static>
+        <pose>0 -5 0.75 0 0 0</pose>
+        <link name="link">
         <collision name="collision">
           <geometry><box><size>10 0.2 1.5</size></box></geometry>
         </collision>
@@ -101,13 +106,13 @@
           <geometry><box><size>10 0.2 1.5</size></box></geometry>
           <material><diffuse>0.5 0.5 0.5 1</diffuse></material>
         </visual>
-      </link>
-    </model>
+        </link>
+      </model>
 
-    <model name="wall_east">
-      <static>true</static>
-      <pose>5 0 0.75 0 0 0</pose>
-      <link name="link">
+      <model name="wall_east">
+        <static>true</static>
+        <pose>5 0 0.75 0 0 0</pose>
+        <link name="link">
         <collision name="collision">
           <geometry><box><size>0.2 10 1.5</size></box></geometry>
         </collision>
@@ -115,13 +120,13 @@
           <geometry><box><size>0.2 10 1.5</size></box></geometry>
           <material><diffuse>0.5 0.5 0.5 1</diffuse></material>
         </visual>
-      </link>
-    </model>
+        </link>
+      </model>
 
-    <model name="wall_west">
-      <static>true</static>
-      <pose>-5 0 0.75 0 0 0</pose>
-      <link name="link">
+      <model name="wall_west">
+        <static>true</static>
+        <pose>-5 0 0.75 0 0 0</pose>
+        <link name="link">
         <collision name="collision">
           <geometry><box><size>0.2 10 1.5</size></box></geometry>
         </collision>
@@ -129,21 +134,21 @@
           <geometry><box><size>0.2 10 1.5</size></box></geometry>
           <material><diffuse>0.5 0.5 0.5 1</diffuse></material>
         </visual>
-      </link>
-    </model>
+        </link>
+      </model>
 
-    <!-- Hinged door in the north wall (1.0m wide, 1.5m tall, 0.05m thick) -->
-    <model name="swing_door">
-      <!-- Place hinge on the north wall line at y=5, z at mid-height -->
-      <pose>0 5 0.75 0 0 0</pose>
-      <self_collide>false</self_collide>
+      <!-- Hinged door in the north wall (1.0m wide, 1.5m tall, 0.05m thick) -->
+      <model name="swing_door">
+        <!-- Place hinge on the north wall line at y=5, z at mid-height -->
+        <pose>0 5 0.75 0 0 0</pose>
+        <self_collide>false</self_collide>
 
-      <!-- Door frame/jamb (fixed in place) -->
-      <link name="frame">
+        <!-- Door frame/jamb (fixed in place) -->
+        <link name="frame">
         <inertial><mass>10</mass>
           <inertia>
-            <ixx>1</ixx><iyy>1</iyy><izz>1</izz>
-            <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+          <ixx>1</ixx><iyy>1</iyy><izz>1</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
           </inertia>
         </inertial>
         <collision name="collision">
@@ -153,14 +158,14 @@
           <geometry><box><size>0.1 0.2 1.5</size></box></geometry>
           <material><diffuse>0.2 0.2 0.2 1</diffuse></material>
         </visual>
-      </link>
+        </link>
 
-      <!-- Door leaf: origin at hinge; geometry offset 0.5m along +X -->
-      <link name="leaf">
+        <!-- Door leaf: origin at hinge; geometry offset 0.5m along +X -->
+        <link name="leaf">
         <inertial><mass>5</mass>
           <inertia>
-            <ixx>1</ixx><iyy>1</iyy><izz>0.5</izz>
-            <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+          <ixx>1</ixx><iyy>1</iyy><izz>0.5</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
           </inertia>
         </inertial>
         <collision name="collision">
@@ -172,24 +177,23 @@
           <geometry><box><size>1.0 0.05 1.5</size></box></geometry>
           <material><diffuse>0.6 0.4 0.2 1</diffuse></material>
         </visual>
-      </link>
+        </link>
 
-      <!-- Revolute hinge around Z (vertical). Angle 0 = closed (in wall plane) -->
-      <joint name="hinge" type="revolute">
+        <!-- Revolute hinge around Z (vertical). Angle 0 = closed (in wall plane) -->
+        <joint name="hinge" type="revolute">
         <parent>frame</parent>
         <child>leaf</child>
         <pose>0 0 0 0 0 0</pose>
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
-            <lower>-1.57</lower>   <!-- ~ -90 deg (opens inward) -->
-            <upper>1.57</upper>    <!-- ~  90 deg -->
+          <lower>-1.57</lower>   <!-- ~ -90 deg (opens inward) -->
+          <upper>1.57</upper>    <!-- ~  90 deg -->
           </limit>
           <dynamics>
-            <damping>0.5</damping>
+          <damping>0.5</damping>
           </dynamics>
         </axis>
-      </joint>
-    </model>
-  </world>
-</sdf>
+        </joint>
+      </model>
+
