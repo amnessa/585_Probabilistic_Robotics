@@ -26,11 +26,11 @@ def generate_launch_description():
         '/camera/depth_image@sensor_msgs/msg/Image@ignition.msgs.Image',
         '/camera/camera_info@sensor_msgs/msg/CameraInfo@ignition.msgs.CameraInfo',
 
-        # Lidar + IMU on blue robot (GZ -> ROS) - CORRECTED SYNTAX
+        # Lidar + IMU on blue robot (GZ -> ROS) -
         '/lidar@sensor_msgs/msg/LaserScan@ignition.msgs.LaserScan',
         '/imu@sensor_msgs/msg/Imu@ignition.msgs.IMU',
 
-        # TF and simulation clock (GZ -> ROS) - CORRECTED SYNTAX
+        # TF and simulation clock (GZ -> ROS) -
         '/model/vehicle_green/tf@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
         '/model/vehicle_blue/tf@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
         '/clock@rosgraph_msgs/msg/Clock@ignition.msgs.Clock',
