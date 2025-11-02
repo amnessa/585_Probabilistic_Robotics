@@ -184,7 +184,7 @@
           <surface>
             <friction>
               <ode>
-                <mu>1.0</mu>   <mu2>0.8</mu2>  <slip1>0.05</slip1> <slip2>0.05</slip2> </ode>
+                <mu>1.0</mu>   <mu2>0.8</mu2>  <slip1>0.0</slip1> <slip2>0.0</slip2> </ode>
             </friction>
             <contact>
               <ode>
@@ -230,7 +230,7 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>1.0</mu>   <mu2>0.8</mu2>  <slip1>0.1</slip1> <slip2>0.1</slip2> </ode>
+                  <mu>1.0</mu>   <mu2>0.8</mu2>  <slip1>0.0</slip1> <slip2>0.0</slip2> </ode>
               </friction>
               <contact>
                 <ode>
@@ -315,11 +315,13 @@
         <child>caster</child>
       </joint>
 
+
+
       <plugin
         filename="ignition-gazebo-diff-drive-system"
         name="ignition::gazebo::systems::DiffDrive">
-       <!-- <odom_noise_xyz>0.001 0.001 0.001</odom_noise_xyz> -->
-       <!-- <odom_noise_rpy>0.001 0.001 0.001</odom_noise_rpy> -->
+        <odom_noise_xyz>0.001 0.001 0.001</odom_noise_xyz>
+        <odom_noise_rpy>0.001 0.001 0.001</odom_noise_rpy>
         <left_joint>left_wheel_joint</left_joint>
         <right_joint>right_wheel_joint</right_joint>
         <wheel_separation>1.25</wheel_separation>
