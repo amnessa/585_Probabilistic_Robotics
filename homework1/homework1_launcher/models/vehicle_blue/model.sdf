@@ -230,7 +230,7 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>1.0</mu>   <mu2>0.8</mu2>  <slip1>0.05</slip1> <slip2>0.05</slip2> </ode>
+                  <mu>1.0</mu>   <mu2>0.8</mu2>  <slip1>0.1</slip1> <slip2>0.1</slip2> </ode>
               </friction>
               <contact>
                 <ode>
