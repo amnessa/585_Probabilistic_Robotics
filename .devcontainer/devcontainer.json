@@ -74,5 +74,5 @@
     },
 
     // Install slam_toolbox and ensure terminal sources ROS setup
-    "postCreateCommand": "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y ros-humble-slam-toolbox && echo 'source /opt/ros/humble/setup.bash' >> ~/.bashrc"
+    "postCreateCommand": "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y ros-humble-slam-toolbox mesa-utils && echo 'source /opt/ros/humble/setup.bash' >> ~/.bashrc"
 }
