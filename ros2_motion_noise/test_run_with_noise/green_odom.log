@@ -1,0 +1,33 @@
+header {
+  stamp {
+    sec: 49
+    nsec: 850000000
+  }
+  data {
+    key: "frame_id"
+    value: "vehicle_green/odom"
+  }
+  data {
+    key: "child_frame_id"
+    value: "vehicle_green/chassis"
+  }
+}
+pose {
+  position {
+    x: 10.890285684049191
+    y: 5.6082624359697633
+  }
+  orientation {
+    z: 0.10807740370813464
+    w: 0.99414248214615042
+  }
+}
+twist {
+  linear {
+    x: 0.49999999999954525
+  }
+  angular {
+    z: -0.000787305739322619
+  }
+}
+
