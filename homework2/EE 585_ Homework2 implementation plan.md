@@ -120,38 +120,40 @@ Here is a breakdown of each question from ee585\_Hw2\_v3.pdf and where to find t
 * **Implementation:**
   1. Your function will take (x, y, theta), (v, w), dt, and the 6 noise parameters (a1...a6).
   2. Define a helper function sample(b\_squared) that returns a sample from a normal distribution with variance b\_squared: return np.random.normal(0, np.sqrt(b\_squared)).
-  3. Implement the algorithm from the slides *exactly*. **Note:** The slides (and textbook) use $\\alpha\_1|v| \+ \\alpha\_2|\\omega|$ as the *variance* parameter. Your homework PDF seems to imply these are *variances*. The textbook Table 5.3 (pg 124\) shows the $sample()$ function applied to $a\_1v^2 \+ a\_2w^2$. Let's follow the **textbook Table 5.3 / slide 36** as it's an explicit algorithm:
+  3. Implement the algorithm from the slides *exactly*. **Note:** The slides (and textbook) use $\alpha\_1|v| + \alpha\_2|\omega|$ as the *variance* parameter. Your homework PDF seems to imply these are *variances*. The textbook Table 5.3 (pg 124) shows the $sample()$ function applied to $a\_1v^2 + a\_2w^2$. Let's follow the **textbook Table 5.3 / slide 36** as it's an explicit algorithm:
+```python
      import numpy as np
-     \# Helper function to sample from a normal dist with variance b\_squared
-     def sample(b\_squared):
-         if b\_squared \< 0:
-             b\_squared \= 0
-         return np.random.normal(0, np.sqrt(b\_squared))
+     # Helper function to sample from a normal dist with variance b_squared
+     def sample(b_squared):
+         if b_squared < 0:
+             b_squared = 0
+         return np.random.normal(0, np.sqrt(b_squared))
 
-     \# 1\. Calculate noisy velocities
-     v\_hat \= v \+ sample(a1\*v\*\*2 \+ a2\*w\*\*2)
-     w\_hat \= w \+ sample(a3\*v\*\*2 \+ a4\*w\*\*2)
+     # 1\. Calculate noisy velocities
+     v_hat = v + sample(a1*v**2 + a2*w**2)
+     w_hat = w + sample(a3*v**2 + a4*w**2)
 
-     \# 2\. Calculate noisy drift
-     gamma\_hat \= sample(a5\*v\*\*2 \+ a6\*w\*\*2)
+     # 2\. Calculate noisy drift
+     gamma_hat = sample(a5*v**2 + a6*w**2)
 
-     \# 3\. Get current pose
-     x, y, theta \= current\_pose
+     # 3\. Get current pose
+     x, y, theta = current_pose
 
-     \# 4\. Handle singularity (straight line motion)
-     if abs(w\_hat) \< 1e-6:
-         x\_prime \= x \+ v\_hat \* dt \* np.cos(theta)
-         y\_prime \= y \+ v\_hat \* dt \* np.sin(theta)
+     # 4\. Handle singularity (straight line motion)
+     if abs(w_hat) < 1e-6:
+         x_prime = x + v_hat * dt * np.cos(theta)
+         y_prime = y + v_hat * dt * np.sin(theta)
      else:
-         \# 5\. Handle curved motion
-         v\_over\_w \= v\_hat / w\_hat
-         x\_prime \= x \- v\_over\_w \* np.sin(theta) \+ v\_over\_w \* np.sin(theta \+ w\_hat \* dt)
-         y\_prime \= y \+ v\_over\_w \* np.cos(theta) \- v\_over\_w \* np.cos(theta \+ w\_hat \* dt)
+         # 5\. Handle curved motion
+         v_over_w = v_hat / w_hat
+         x_prime = x - v_over_w * np.sin(theta) + v_over_w * np.sin(theta + w_hat * dt)
+         y_prime = y + v_over_w * np.cos(theta) - v_over_w * np.cos(theta + w_hat * dt)
 
-     \# 6\. Add final rotation
-     theta\_prime \= theta \+ w\_hat \* dt \+ gamma\_hat \* dt
+     # 6\. Add final rotation
+     theta_prime = theta + w_hat * dt + gamma_hat * dt
 
-     return (x\_prime, y\_prime, theta\_prime)
+     return (x_prime, y_prime, theta_prime)
+```
 
 * **Simulation & Report:**
   * To replicate the plots on **Page 39** of the motion slides:
@@ -172,21 +174,32 @@ Here is a breakdown of each question from ee585\_Hw2\_v3.pdf and where to find t
 
 ### **Q3: 1D Robot Dynamics**
 
-* **Objective:** Solve **Chapter 5, Exercise 1** from your textbook.
-* **Source:** Probabilistic Robotics...Full\_book.pdf, **Page 145**.
-* **Task:** This is a theoretical derivation for your PDF report. The question is:"This exercise requires you to add dynamics to the 1-D motion model...
-  (a) Let the state be augmented by velocity... $x\_t \= (x\_t \\quad \\dot{x}\_t)^T$. Formulate a linear Gaussian motion model... The control $u\_t$ is the acceleration $\\ddot{x}\_t$.
-  (b) What is the posterior distribution $p(x\_t | u\_t, x\_{t-1})$?"
-* **Report Section:**
-  1. **State:** Your state vector is $x\_t \= \\begin{pmatrix} x\_t \\\\ \\dot{x}\_t \\end{pmatrix}$.
-  2. **Control:** Your control is $u\_t \= \\ddot{x}\_t$.
-  3. **Kinematics:** Use basic physics equations for constant acceleration over an interval $\\Delta t$:
-     * $x\_t \= x\_{t-1} \+ \\dot{x}\_{t-1}\\Delta t \+ \\frac{1}{2}\\ddot{x}\_t(\\Delta t)^2$
-     * $\\dot{x}\_t \= \\dot{x}\_{t-1} \+ \\ddot{x}\_t\\Delta t$
-  4. **Linear Model:** Write this in the linear form $x\_t \= A\_t x\_{t-1} \+ B\_t u\_t \+ \\epsilon\_t$ (from textbook, Eq. 3.2, page 41).
-     * $A\_t \= \\begin{pmatrix} 1 & \\Delta t \\\\ 0 & 1 \\end{pmatrix}$
-     * $B\_t \= \\begin{pmatrix} \\frac{1}{2}(\\Delta t)^2 \\\\ \\Delta t \\end{pmatrix}$
-  5. **Answer:** The posterior $p(x\_t | u\_t, x\_{t-1})$ is a linear Gaussian distribution. It is given by $\\mathcal{N}(x\_t; \\mu\_t, R\_t)$, where the mean is $\\mu\_t \= A\_t x\_{t-1} \+ B\_t u\_t$ and $R\_t$ is the covariance matrix of the process noise $\\epsilon\_t$ (which you can just state as $R\_t$).
+* **Objective:** Solve Chapter 5, Exercise 1 from the textbook.
+* **Source:** Probabilistic Robotics (2005), Page 145.
+* **Task:** This is a theoretical derivation for your PDF report. The question is:
+"This exercise requires you to add dynamics to the 1-D motion model...
+(a) Let the state be augmented by velocity... $x_t = (x_t \quad \dot{x}_t)^T$. Formulate a linear Gaussian motion model... The control $u_t$ is the acceleration $\ddot{x}_t$.
+(b) What is the posterior distribution $p(x_t | u_t, x_{t-1})$?"
+
+1. **State:** \( x_t = \begin{pmatrix} x_t \\ \dot{x}_t \end{pmatrix} \)
+2. **Control:** \( u_t = \ddot{x}_t \)
+3. **Kinematics (constant acceleration over \(\Delta t\)):**
+  \[
+  x_t = x_{t-1} + \dot{x}_{t-1}\Delta t + \tfrac{1}{2}\ddot{x}_t (\Delta t)^2,\qquad
+  \dot{x}_t = \dot{x}_{t-1} + \ddot{x}_t \Delta t
+  \]
+4. **Linear Gaussian Form:** \( x_t = A_t x_{t-1} + B_t u_t + \epsilon_t \), with
+  \[
+  A_t = \begin{pmatrix} 1 & \Delta t \\ 0 & 1 \end{pmatrix},\qquad
+  B_t = \begin{pmatrix} \tfrac{1}{2}(\Delta t)^2 \\ \Delta t \end{pmatrix},\qquad
+  \epsilon_t \sim \mathcal{N}(0, R_t)
+  \]
+5. **Posterior:**
+  \[
+  p(x_t \mid u_t, x_{t-1}) = \mathcal{N}\big(x_t;\ \mu_t,\ R_t\big),\qquad
+  \mu_t = A_t x_{t-1} + B_t u_t
+  \]
+and \( R_t \) is the covariance matrix of the process noise \( \epsilon_t \).
 
 ### **Q4: Continuous Camera Sensor Model**
 
@@ -199,50 +212,50 @@ Here is a breakdown of each question from ee585\_Hw2\_v3.pdf and where to find t
 #### **(a) Pinhole Camera Model**
 
 * **Report Section:** Research and draw the 2D planar pinhole model (like your lecturer's drawing).
-  * Label the optical center $O$ (this is the robot's pose $x \= (x\_r, y\_r, \\theta\_r)$).
+  * Label the optical center $O$ (this is the robot's pose $x = (x_r, y_r, \theta_r)$).
   * Label the image plane (a 1D line) at focal length $f$.
-  * Label a landmark $L$ from the map $m$ at world coordinates $(m\_x, m\_y)$.
-  * Derive the deterministic projection $z\_{ideal} \= h(x, m)$. This involves:
-    1. Converting the landmark's world coordinates $(m\_x, m\_y)$ to the robot's local coordinates $(L\_{local,x}, L\_{local,y})$ using a rotation and translation based on $x$.
-    2. Using similar triangles to project this local 2D point onto the 1D image plane: $z\_{ideal} \= f \\cdot \\frac{L\_{local,y}}{L\_{local,x}}$ (or a similar expression, depending on your coordinate setup).
+  * Label a landmark $L$ from the map $m$ at world coordinates $(m_x, m_y)$.
+  * Derive the deterministic projection $z_{ideal} = h(x, m)$. This involves:
+    1. Converting the landmark's world coordinates $(m_x, m_y)$ to the robot's local coordinates $(L_{local,x}, L_{local,y})$ using a rotation and translation based on $x$.
+    2. Using similar triangles to project this local 2D point onto the 1D image plane: $z_{ideal} = f \cdot \frac{L_{local,y}}{L_{local,x}}$ (or a similar expression, depending on your coordinate setup).
 
 #### **(b) Noise Model**
 
 * **Report Section:** State the model given in the homework.
-  * The measured pixel is $z \= z\_{ideal} \+ \\mathcal{N}(0, \\sigma^2)$.
-  * Therefore, the *forward sensor model* is $p(z | x, m) \= \\mathcal{N}(z; h(x, m), \\sigma^2)$.
+  * The measured pixel is $z = z_{ideal} + \mathcal{N}(0, \sigma^2)$.
+  * Therefore, the *forward sensor model* is $p(z | x, m) = \mathcal{N}(z; h(x, m), \sigma^2)$.
 
 #### **(c) Procedure**
 
 * **Report Section:** Outline your plan.
-  1. **For the forward model (Q4d):** I will derive the deterministic geometric function $z\_{ideal} \= h(x, m)$ from (a) and plug it into the Gaussian PDF from (b) to get the final algorithm p(z | x, m).
-  2. **For the sampling model (Q4e):** I will analyze the *inverse* problem, $p(x | z, m)$. I will show that a single pixel measurement $z$ (a 1D value) cannot be used to find the full 3D robot pose $x \= (x\_r, y\_r, \\theta\_r)$. I will use the lecturer's "uncertainty cone" concept to explain what *can* be sampled.
+  1. **For the forward model (Q4d):** I will derive the deterministic geometric function $z_{ideal} = h(x, m)$ from (a) and plug it into the Gaussian PDF from (b) to get the final algorithm p(z | x, m).
+  2. **For the sampling model (Q4e):** I will analyze the *inverse* problem, $p(x | z, m)$. I will show that a single pixel measurement $z$ (a 1D value) cannot be used to find the full 3D robot pose $x = (x_r, y_r, \theta_r)$. I will use the lecturer's "uncertainty cone" concept to explain what *can* be sampled.
 
 #### **(d) Derivation (Forward Model)**
 
 * **Objective:** Derive algorithm\_camera\_model(z, x, m).
 * **Task:** This function just computes the value $p(z | x, m)$.
 * **Report Section:**
-  1. Your function will be analogous to landmark\_model\_known\_correspondence from your slides (Page 46\) or textbook (**Page 178, Table 6.4**).
-  2. **Input:** Robot pose $x$, map $m$ (which gives landmark $L\_j$), and pixel measurement $z$.
-  3. **Step 1:** Calculate the *expected* (ideal) pixel measurement, $z\_{ideal} \= h(x, m)$, using your pinhole geometry from (a).
-  4. **Step 2:** Calculate the *error* (innovation): $\\Delta z \= z \- z\_{ideal}$.
-  5. Step 3: Calculate the probability of this error using the Gaussian PDF:
-     prob \= (1 / (sigma \* sqrt(2\*pi))) \* exp(-0.5 \* (delta\_z / sigma)\*\*2)
+  1. Your function will be analogous to landmark\_model\_known\_correspondence from your slides (Page 46) or textbook (**Page 178, Table 6.4**).
+  2. **Input:** Robot pose $x$, map $m$ (which gives landmark $L_j$), and pixel measurement $z$.
+  3. **Step 1:** Calculate the *expected* (ideal) pixel measurement, $z_{ideal} = h(x, m)$, using your pinhole geometry from (a).
+  4. **Step 2:** Calculate the *error* (innovation): $\Delta z = z - z_{ideal}$.
+  5. **Step 3:** Calculate the probability of this error using the Gaussian PDF:
+     prob = (1 / (sigma * sqrt(2*pi))) * exp(-0.5 * (delta_z / sigma)**2)
   6. This prob is the return value of your algorithm.
 
 #### **(e) Derivation (Sampling Model)**
 
-* **Objective:** Derive sample\_robotpose\_camera\_model(...).
-* **Source:** Analogy to sample\_landmark\_model\_known\_correspondence from Probabilistic Robotics...Full\_book.pdf (**Page 180, Table 6.5**).
+* **Objective:** Derive sample_robotpose_camera_model(...).
+* **Source:** Analogy to sample_landmark_model_known_correspondence from Probabilistic Robotics...Full_book.pdf (**Page 180, Table 6.5**).
 * **Report Section:**
   1. The algorithm in Table 6.5 samples a pose from a *range and bearing* measurement.
   2. A 1D pixel measurement $z$ only provides **bearing** (direction), not range.
   3. **Answer 1:** "Would this function be able to sample absolute robot poses?" **No.** A single pixel measurement from a single landmark only constrains the pose to a *line* in the world (the "bearing line"). The robot could be anywhere on this line.
-  4. **Answer 2:** "What can you sample?" You can sample the robot's **orientation** $\\theta$ (bearing). The Gaussian noise $\\mathcal{N}(z; \\dots)$ on the 1D pixel plane maps to a (non-Gaussian) angular distribution for $\\theta$ in the world.
-  5. Your sample\_robotpose\_camera\_model(z, m) function would:
-     1. Sample a noisy pixel: z\_sample \= z \+ np.random.normal(0, sigma).
-     2. Back-project this z\_sample from the image plane, through the optical center $O$, to get a bearing line (an angle) in world coordinates.
+  4. **Answer 2:** "What can you sample?" You can sample the robot's **orientation** $\theta$ (bearing). The Gaussian noise $\mathcal{N}(z; \dots)$ on the 1D pixel plane maps to a (non-Gaussian) angular distribution for $\theta$ in the world.
+  5. Your sample_robotpose_camera_model(z, m) function would:
+     1. Sample a noisy pixel: z_sample = z + np.random.normal(0, sigma).
+     2. Back-project this z_sample from the image plane, through the optical center $O$, to get a bearing line (an angle) in world coordinates.
      3. This sampled angle is a sample of the robot's possible orientation, but its (x, y) position remains unconstrained along that line.
 
 #### **(f) Discussion**
@@ -253,6 +266,6 @@ Here is a breakdown of each question from ee585\_Hw2\_v3.pdf and where to find t
   * The main difficulty is the **asymmetry and non-linearity of the problem** (as explained by your lecturer).
   * **Forward Model p(z|x, m) (Q4d):** This is easy. The physics are causal. You start in the 2D world, project to 1D pixels, and add 1D Gaussian noise.
   * **Inverse Model p(x|z, m) (Q4e):** This is hard. You have to invert the model. You start with a 1D Gaussian distribution on the pixel plane and back-project it into the 2D world.
-  * As your lecturer explained \[01:27 \- 02:05\], this projection is **non-linear**. A simple Gaussian in pixel-space becomes a "weird density" (garip bir density) \[01:45\] or an "uncertainty cone" (belirsizlik bölgesi) \[01:40\] in the 2D world-space.
-  * Therefore, the central difficulty is: **The belief bel(x) \= p(x|z,m) is not Gaussian**, even though the sensor noise itself is. This makes it difficult to represent and sample from, which is a key issue in probabilistic robotics.
+  * As your lecturer explained [01:27 - 02:05], this projection is **non-linear**. A simple Gaussian in pixel-space becomes a "weird density" (garip bir density) [01:45] or an "uncertainty cone" (belirsizlik bölgesi) [01:40] in the 2D world-space.
+  * Therefore, the central difficulty is: **The belief bel(x) = p(x|z,m) is not Gaussian**, even though the sensor noise itself is. This makes it difficult to represent and sample from, which is a key issue in probabilistic robotics.
 
