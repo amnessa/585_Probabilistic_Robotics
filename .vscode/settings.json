@@ -2,5 +2,6 @@
     "ros.distro": "humble",
     "files.associations": {
         "functional": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "/workspaces/585_Probabilistic_Robotics/homework1/homework1_launcher"
 }

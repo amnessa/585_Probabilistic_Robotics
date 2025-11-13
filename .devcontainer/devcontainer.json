@@ -69,7 +69,25 @@
                 "tomoki1207.pdf",
                 "twxs.cmake",
                 "yzane.markdown-pdf"
-            ]
+            ],
+
+            "settings": {
+                "files.watcherExclude": {
+                    "**/.git/objects/**": true,
+                    "**/.git/subtree-cache/**": true,
+                    "**/build/**": true,
+                    "**/install/**": true,
+                    "**/log/**": true
+                },
+                "search.exclude": {
+                    "**/build/**": true,
+                    "**/install/**": true,
+                    "**/log/**": true
+                },
+                "C_Cpp.default.browse.path": [
+                    "${workspaceFolder}/**"
+                ]
+            }
         }
     },
 
