@@ -26,13 +26,19 @@ def generate_launch_description():
         '/camera/depth_image@sensor_msgs/msg/Image@ignition.msgs.Image',
         '/camera/camera_info@sensor_msgs/msg/CameraInfo@ignition.msgs.CameraInfo',
 
-        # Lidar + IMU on blue robot (GZ -> ROS) -
+        # Lidar + IMU on blue robot (GZ -> ROS)
         '/lidar@sensor_msgs/msg/LaserScan@ignition.msgs.LaserScan',
         '/imu@sensor_msgs/msg/Imu@ignition.msgs.IMU',
 
-        # TF and simulation clock (GZ -> ROS) -
+        # Ground-truth TF (GZ -> ROS)
         '/model/vehicle_green/tf@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
         '/model/vehicle_blue/tf@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
+
+        # Optional: static transforms (GZ -> ROS) from PosePublisher’s pose_static
+        '/model/vehicle_blue/pose_static@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
+        '/model/vehicle_green/pose_static@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
+
+        # Clock (GZ -> ROS)
         '/clock@rosgraph_msgs/msg/Clock@ignition.msgs.Clock',
     ]
     bridge = Node(
@@ -40,10 +46,13 @@ def generate_launch_description():
         executable='parameter_bridge',
         arguments=bridge_args,
         output='screen',
-        # Remap the ROS-side names of the TF topics to /tf
         remappings=[
+            # Map TF streams to /tf
             ('/model/vehicle_green/tf', '/tf'),
             ('/model/vehicle_blue/tf', '/tf'),
+            # Map static Pose_V to /tf_static
+            ('/model/vehicle_green/pose_static', '/tf_static'),
+            ('/model/vehicle_blue/pose_static', '/tf_static'),
         ]
     )
 
