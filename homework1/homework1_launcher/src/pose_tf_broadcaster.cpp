@@ -27,14 +27,18 @@ public:
     tf_br_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
     static_br_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
 
+    auto tf_qos = rclcpp::QoS(rclcpp::KeepLast(100))
+        .best_effort()
+        .durability_volatile();
+
     sub_pose_ = this->create_subscription<tf2_msgs::msg::TFMessage>(
-      "pose", rclcpp::QoS(10),
+      "pose", tf_qos,
       [this](const tf2_msgs::msg::TFMessage::SharedPtr msg) {
         tf_br_->sendTransform(msg->transforms);
       });
 
     sub_pose_static_ = this->create_subscription<tf2_msgs::msg::TFMessage>(
-      "pose_static", rclcpp::QoS(10),
+      "pose_static", tf_qos,
       [this](const tf2_msgs::msg::TFMessage::SharedPtr msg) {
         static_br_->sendTransform(msg->transforms);
       });
