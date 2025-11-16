@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.5)
 project(homework1_launcher)
 
 find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_msgs REQUIRED)
 
 # Install assets
 install(DIRECTORY
@@ -25,5 +28,9 @@ install(FILES package.xml
 
 # Environment hook so Gazebo finds worlds/models
 ament_environment_hooks(${CMAKE_CURRENT_SOURCE_DIR}/hooks/${PROJECT_NAME}.dsv)
+
+add_executable(pose_tf_broadcaster src/pose_tf_broadcaster.cpp)
+ament_target_dependencies(pose_tf_broadcaster rclcpp tf2_ros tf2_msgs)
+install(TARGETS pose_tf_broadcaster DESTINATION lib/${PROJECT_NAME})
 
 ament_package()

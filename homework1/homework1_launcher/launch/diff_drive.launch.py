@@ -30,11 +30,9 @@ def generate_launch_description():
         '/lidar@sensor_msgs/msg/LaserScan@ignition.msgs.LaserScan',
         '/imu@sensor_msgs/msg/Imu@ignition.msgs.IMU',
 
-        # Ground-truth TF (GZ -> ROS)
-        '/model/vehicle_green/tf@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
-        '/model/vehicle_blue/tf@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
-
-        # Optional: static transforms (GZ -> ROS) from PosePublisher’s pose_static
+        # Ground-truth poses (GZ -> ROS). Bridge Pose_V to TFMessage on per-model topics.
+        '/model/vehicle_blue/pose@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
+        '/model/vehicle_green/pose@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
         '/model/vehicle_blue/pose_static@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
         '/model/vehicle_green/pose_static@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
 
@@ -46,13 +44,17 @@ def generate_launch_description():
         executable='parameter_bridge',
         arguments=bridge_args,
         output='screen',
+    )
+
+    # One broadcaster per robot, remapped to the bridged topics
+    pose_tf_blue = Node(
+        package='homework1_launcher',
+        executable='pose_tf_broadcaster',
+        name='pose_tf_broadcaster_blue',
+        output='screen',
         remappings=[
-            # Map TF streams to /tf
-            ('/model/vehicle_green/tf', '/tf'),
-            ('/model/vehicle_blue/tf', '/tf'),
-            # Map static Pose_V to /tf_static
-            ('/model/vehicle_green/pose_static', '/tf_static'),
-            ('/model/vehicle_blue/pose_static', '/tf_static'),
+            ('pose', '/model/vehicle_blue/pose'),
+            ('pose_static', '/model/vehicle_blue/pose_static'),
         ]
     )
 
@@ -63,6 +65,17 @@ def generate_launch_description():
         arguments=['0.30', '0', '0.40', '0', '0', '0',
                    'vehicle_green/chassis', 'vehicle_green/chassis/rgbd'],
         output='screen'
+    )
+
+    pose_tf_green = Node(
+        package='homework1_launcher',
+        executable='pose_tf_broadcaster',
+        name='pose_tf_broadcaster_green',
+        output='screen',
+        remappings=[
+            ('pose', '/model/vehicle_green/pose'),
+            ('pose_static', '/model/vehicle_green/pose_static'),
+        ]
     )
 
     rviz = Node(
@@ -114,5 +127,6 @@ def generate_launch_description():
         output='screen'
     )
 
-    return LaunchDescription([gz, bridge, tf_blue, tf_green, cam_tf, rviz,
+    return LaunchDescription([gz, bridge, pose_tf_blue, pose_tf_green,
+                              tf_blue, tf_green, cam_tf, rviz,
                               lidar_mount_tf, lidar_tf, imu_mount_tf, imu_tf])

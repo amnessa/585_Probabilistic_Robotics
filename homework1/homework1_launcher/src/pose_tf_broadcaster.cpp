@@ -12,47 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
 #include <iostream>
-
-// include ROS 1
-#ifdef __clang__
-# pragma clang diagnostic push
-# pragma clang diagnostic ignored "-Wunused-parameter"
-#endif
-#include <ros/ros.h>
-#ifdef __clang__
-# pragma clang diagnostic pop
-#endif
-
-#include <geometry_msgs/TransformStamped.h>
-#include <tf2_msgs/TFMessage.h>
+#include <rclcpp/rclcpp.hpp>
+#include <tf2_msgs/msg/tf_message.hpp>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 
-void poseCallback(const tf2_msgs::TFMessage &_msg)
+class PoseTfBroadcaster : public rclcpp::Node {
+public:
+  PoseTfBroadcaster()
+  : rclcpp::Node("pose_tf_broadcaster")
+  {
+    tf_br_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
+    static_br_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
+
+    sub_pose_ = this->create_subscription<tf2_msgs::msg::TFMessage>(
+      "pose", rclcpp::QoS(10),
+      [this](const tf2_msgs::msg::TFMessage::SharedPtr msg) {
+        tf_br_->sendTransform(msg->transforms);
+      });
+
+    sub_pose_static_ = this->create_subscription<tf2_msgs::msg::TFMessage>(
+      "pose_static", rclcpp::QoS(10),
+      [this](const tf2_msgs::msg::TFMessage::SharedPtr msg) {
+        static_br_->sendTransform(msg->transforms);
+      });
+  }
+
+private:
+  std::shared_ptr<tf2_ros::TransformBroadcaster> tf_br_;
+  std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_br_;
+  rclcpp::Subscription<tf2_msgs::msg::TFMessage>::SharedPtr sub_pose_;
+  rclcpp::Subscription<tf2_msgs::msg::TFMessage>::SharedPtr sub_pose_static_;
+};
+
+int main(int argc, char **argv)
 {
-  static tf2_ros::TransformBroadcaster br;
-  br.sendTransform(_msg.transforms);
-}
-
-void poseStaticCallback(const tf2_msgs::TFMessage &_msg)
-{
-   static tf2_ros::StaticTransformBroadcaster brStatic;
-   brStatic.sendTransform(_msg.transforms);
-}
-
-//////////////////////////////////////////////////
-int main(int argc, char * argv[])
-{
-  ros::init(argc, argv, "pose_tf_broadcaster");
-
-  ros::NodeHandle node;
-  ros::Subscriber sub = node.subscribe("pose", 10, &poseCallback);
-
-  ros::Subscriber subStatic = node.subscribe(
-      "pose_static", 10, &poseStaticCallback);
-
-  ros::spin();
-
+  rclcpp::init(argc, argv);
+  rclcpp::spin(std::make_shared<PoseTfBroadcaster>());
+  rclcpp::shutdown();
   return 0;
 }
