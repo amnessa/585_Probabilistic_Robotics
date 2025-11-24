@@ -1,6 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
+from pathlib import Path
+
+# Base directory = folder where this script lives
+BASE_DIR = Path(__file__).resolve().parent
+
+# Save visuals in a "visuals" subfolder next to this script
+outdir = BASE_DIR / "visuals"
+outdir.mkdir(exist_ok=True)
 
 # --- CONFIGURATION ---
 dt = 1.0
@@ -70,6 +78,7 @@ plt.xlabel("Position (x)")
 plt.ylabel("Velocity (x_dot)")
 plt.legend()
 plt.grid(True)
+plt.savefig(outdir / 'q1_plot1.png', dpi=150)
 plt.show()
 
 # --- Q1 (d) & (e) KF Prediction Step ---
@@ -125,4 +134,5 @@ print("Interpretation: Position and Velocity become highly positively correlated
 
 ax.legend()
 plt.axis('equal')
+plt.savefig(outdir / 'q1_plot2.png', dpi=150)
 plt.show()

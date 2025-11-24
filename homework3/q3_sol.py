@@ -2,6 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 import time
+from pathlib import Path
+
+# Base directory = folder where this script lives
+BASE_DIR = Path(__file__).resolve().parent
+
+# Save visuals in a "visuals" subfolder next to this script
+outdir = BASE_DIR / "visuals"
+outdir.mkdir(exist_ok=True)
 
 
 # --- SETUP ---
@@ -89,11 +97,12 @@ plt.plot(particles[:, 0], particles[:, 1], 'k.', alpha=0.1, label='t=0')
 for t in range(1, 6):
     particles = sample_motion_model(particles, dt, sigma_acc)
     # Plot
-    color = plt.cm.get_cmap('viridis')(t/5)
+    color = plt.get_cmap('viridis')(t/5)
     plt.plot(particles[:, 0], particles[:, 1], '.', color=color, alpha=0.3, label=f't={t}')
 
 plt.legend()
 plt.grid(True)
+plt.savefig(outdir / 'q3_plot1.png', dpi=150)
 plt.show()
 
 # --- Q3 (d) Particle Filter with Updates ---
@@ -135,11 +144,12 @@ for t, z in enumerate(measurements, 1):
     particles = low_variance_sampler(particles_pred, weights)
 
     # Plot
-    color = plt.cm.get_cmap('jet')(t/5)
+    color = plt.get_cmap('jet')(t/5)
     plt.plot(particles[:, 0], particles[:, 1], '.', color=color, alpha=0.2, label=f't={t}')
 
 plt.legend()
 plt.grid(True)
+plt.savefig(outdir / 'q3_plot2.png', dpi=150)
 plt.show()
 
 # --- Q3 (e) Complexity Comparison ---

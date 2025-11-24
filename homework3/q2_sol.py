@@ -1,6 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
+from pathlib import Path
+
+# Base directory = folder where this script lives
+BASE_DIR = Path(__file__).resolve().parent
+
+# Save visuals in a "visuals" subfolder next to this script
+outdir = BASE_DIR / "visuals"
+outdir.mkdir(exist_ok=True)
 
 # --- IMPORT SETUP FROM Q1 ---
 dt = 1.0
@@ -73,6 +81,7 @@ ax.set_title("Q2(b): Update at t=5")
 ax.set_xlabel("Position")
 ax.set_ylabel("Velocity")
 ax.legend()
+plt.savefig(outdir / 'q2_plot1.png', dpi=150)
 plt.show()
 
 
@@ -115,10 +124,11 @@ for t, z_val in enumerate(measurements, 1):
     Sigma = (np.eye(2) - K @ C) @ Sigma_bar
 
     # Plot
-    cmap = plt.cm.get_cmap('jet')
+    cmap = plt.get_cmap('jet')
     color = cmap(t/5)
     plot_ellipse(mu, Sigma, ax2, color, label=f"t={t} (Posterior)")
     ax2.plot(mu[0], mu[1], 'o', color=color)
 
 ax2.legend()
+plt.savefig(outdir / 'q2_plot2.png', dpi=150)
 plt.show()
