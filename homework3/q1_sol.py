@@ -56,29 +56,30 @@ def plot_covariance_ellipse(mean, cov, ax, n_std: float = 1.0, color: Any = 'b',
     return ell
 
 # --- Q1 (b) Simulate True Motion ---
-def simulate_system(steps, initial_state):
-    states = [initial_state]
+def simulate_trajectory(steps):
+    state = mu_0.copy()
+    path_x = [state[0]]
+    path_v = [state[1]]
     for _ in range(steps):
-        # Random acceleration
         acc = np.random.normal(0, sigma_acc)
-        # Update based on physics
-        curr_p, curr_v = states[-1]
-        new_p = curr_p + curr_v * dt + 0.5 * acc * dt**2
-        new_v = curr_v + acc * dt
-        states.append(np.array([new_p, new_v]))
-    return np.array(states)
+        state = A @ state + (G * acc).flatten()
+        path_x.append(state[0])
+        path_v.append(state[1])
+    return path_x, path_v
 
-# Plotting True Motion
+# PLOT 1: Position vs Time (Trajectory)
 plt.figure(figsize=(10, 5))
-plt.title("Q1(b): Simulated True Motion (3 Instances)")
+plt.title("Q1(b): True State Trajectories (Position vs Time)")
+time_steps = range(6) # t=0 to t=5
 for i in range(3):
-    traj = simulate_system(5, mu_0)
-    plt.plot(traj[:, 0], traj[:, 1], marker='o', label=f'Instance {i+1}')
-plt.xlabel("Position (x)")
-plt.ylabel("Velocity (x_dot)")
-plt.legend()
+    px, pv = simulate_trajectory(5)
+    plt.plot(time_steps, px, marker='o', linestyle='-', linewidth=2, label=f'Instance {i+1}')
+
+plt.xlabel("Time Step (t)")
+plt.ylabel("Position (x)")
+plt.xticks(time_steps)
 plt.grid(True)
-plt.savefig(outdir / 'q1_plot1.png', dpi=150)
+plt.legend()
 plt.show()
 
 # --- Q1 (d) & (e) KF Prediction Step ---
@@ -87,12 +88,12 @@ Sigma = Sigma_0.copy()
 
 fig, ax = plt.subplots(figsize=(10, 8))
 ax.set_title("Q1(e): State Prediction Density (1-sigma Ellipses)")
-ax.set_xlabel("Position")
-ax.set_ylabel("Velocity")
+ax.set_xlabel("Position (x)")
+ax.set_ylabel("Velocity (x_dot)")
 ax.grid(True)
 
 # Plot initial state
-ax.plot(mu[0], mu[1], 'ko', label="t=0")
+ax.plot(mu[0], mu[1], 'ko', label="t=0 Mean")
 
 print("--- Kalman Filter Prediction Step ---")
 print(f"t=0: Mean={mu}, Cov=\n{Sigma}")

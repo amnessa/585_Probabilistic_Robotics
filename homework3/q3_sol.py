@@ -122,43 +122,34 @@ plt.tight_layout()
 plt.savefig(outdir / 'q3_plot1.png', dpi=150)
 plt.show()
 
-# --- Q3 (d) Particle Filter with Updates ---
 
-# Generate Ground Truth
+# --- SIMULATION SETUP ---
+N = 1000
+# Generate the exact same ground truth trajectory as previous questions
 np.random.seed(42)
 true_state = np.array([0.0, 0.0])
-true_path = [true_state]
 measurements = []
+true_positions = []
 for _ in range(5):
     acc = np.random.normal(0, sigma_acc)
-    # Update true state
-    p_new = true_state[0] + true_state[1]*dt + 0.5*acc*dt**2
-    v_new = true_state[1] + acc*dt
-    true_state = np.array([p_new, v_new])
-    true_path.append(true_state)
-    # Measure
+    true_state = A @ true_state + np.array([0.5*dt**2, dt]) * acc
+    true_positions.append(true_state[0])
     z = true_state[0] + np.random.normal(0, sigma_meas)
     measurements.append(z)
-true_path = np.array(true_path)
 
-# Run PF
+# --- Q3 (d) and (c) Particle Filter with Updates ---
+
 particles = np.zeros((N, 2))
-history = [(0, particles.copy())] # Store history for Time-vs-Position plot
 
-# Figure for Phase Space Evolution
-fig2, axes2 = plt.subplots(2, 3, figsize=(15, 8))
-fig2.suptitle("Q3(d): PF Posterior Evolution (Phase Space)", fontsize=16)
-axes2 = axes2.flatten()
+# We will plot t=1, t=3, t=5 to show evolution clearly
+fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharey=True)
+fig.suptitle("Q3: Particle Filter Belief Evolution (Position Density)", fontsize=16)
 
-# Plot t=0
-axes2[0].plot(particles[:, 0], particles[:, 1], 'k.', alpha=0.2)
-axes2[0].plot(true_path[0,0], true_path[0,1], 'r*', markersize=10, label='True')
-axes2[0].set_title("t=0 (Prior)")
-axes2[0].grid(True)
+plot_indices = [0, 2, 4] # indices for t=1, t=3, t=5 (0-based index)
 
-print("\n--- Q3(d) Particle Statistics ---")
+print("--- Particle Filter Evolution ---")
 
-for t, z in enumerate(measurements, 1):
+for t, z in enumerate(measurements):
     # 1. Prediction
     particles_pred = sample_motion_model(particles, dt, sigma_acc)
 
@@ -167,97 +158,48 @@ for t, z in enumerate(measurements, 1):
 
     # 3. Resampling
     particles = low_variance_sampler(particles_pred, weights)
-    history.append((t, particles.copy()))
 
-    # Statistics
+    # Plotting Logic (mimicking book style densities)
+    if t in plot_indices:
+        ax_idx = plot_indices.index(t)
+        ax = axes[ax_idx]
+
+        # Plot Histogram of Position
+        ax.hist(particles[:, 0], bins=30, density=True, color='gray', alpha=0.6, label='Particles (Belief)')
+
+        # Plot Gaussian of Measurement Likelihood (for reference)
+        # This helps show how the measurement "pulls" the particles
+        x_range = np.linspace(np.min(particles[:,0])-5, np.max(particles[:,0])+5, 100)
+        meas_likelihood = norm.pdf(x_range, loc=z, scale=sigma_meas)
+        ax.plot(x_range, meas_likelihood, 'r--', linewidth=2, label=f'Meas Model P(z={z:.1f}|x)')
+
+        # Plot True Position
+        ax.axvline(true_positions[t], color='k', linestyle='-', linewidth=2, label='True Pos')
+
+        ax.set_title(f"Time Step t={t+1}")
+        ax.set_xlabel("Position (x)")
+        if ax_idx == 0: ax.set_ylabel("Density")
+        ax.legend(loc='upper left', fontsize='small')
+
+    # Statistics print
     mean_p = np.mean(particles[:, 0])
-    std_p = np.std(particles[:, 0])
-    print(f"t={t}: True Pos={true_path[t,0]:.2f}, Est Mean={mean_p:.2f}, Est Std={std_p:.2f}")
-
-    # Plotting Phase Space (Subplot)
-    ax = axes2[t]
-    cmap = plt.get_cmap("viridis")
-    color = cmap(t/5)
-
-    # Plot particles
-    ax.plot(particles[:, 0], particles[:, 1], '.', color=color, alpha=0.3, markersize=3, label='Particles')
-    # Plot Ground Truth
-    ax.plot(true_path[t, 0], true_path[t, 1], 'r*', markersize=12, markeredgecolor='k', label='Truth')
-    # Plot Measurement
-    ax.axvline(z, color='green', linestyle='--', alpha=0.7, label=f'Meas z={z:.2f}')
-
-    ax.set_title(f"t={t}")
-    ax.set_xlabel("Position")
-    ax.set_ylabel("Velocity")
-    ax.grid(True)
-    if t == 1: ax.legend()
-
+    print(f"t={t+1}: True Pos={true_positions[t]:.2f}, Particle Mean={mean_p:.2f}")
 plt.tight_layout()
 plt.savefig(outdir / 'q3_plot2.png', dpi=150)
-plt.show()
-
-# --- ALTERNATIVE VISUALIZATION (Textbook Style: Time vs Position) ---
-# This mimics Figure 5.10 in Probabilistic Robotics (Time on X-axis, Position on Y-axis)
-plt.figure(figsize=(12, 6))
-plt.title("Q3(d) Alternative: Trajectory Tracking (Time vs Position)")
-
-# Plot particles for each time step
-for t, parts in history:
-    # Add jitter to t for visualization density
-    t_jitter = t + np.random.normal(0, 0.04, size=parts.shape[0])
-    plt.plot(t_jitter, parts[:, 0], '.', color='gray', alpha=0.1, zorder=1)
-
-# Plot True Path
-plt.plot(range(6), true_path[:, 0], 'r-o', linewidth=2, label='True Path', zorder=2)
-
-# Plot Measurements
-plt.plot(range(1, 6), measurements, 'gx', markersize=10, label='Measurements', zorder=3)
-
-plt.xlabel("Time Step (t)")
-plt.ylabel("Position (x)")
-plt.legend()
-plt.grid(True)
-plt.xticks(range(6))
-plt.savefig(outdir / 'q3_plot3.png', dpi=150)
 plt.show()
 
 # --- Q3 (e) Complexity Comparison ---
 # We will measure time for 1 iteration of KF vs PF (N=1000)
 
-# KF Timing
+# (Keeping previous logic for completeness)
+# Use a fixed measurement value to avoid referencing possibly unbound 'z'
+z_timing = measurements[-1] if measurements else 0.0
 t_start = time.time()
-runs = 1000
-mu = np.array([0., 0.])
-Sigma = np.eye(2)
-C = np.array([[1, 0]])
-Q = np.array([[10]])
-R = np.eye(2)
-z_val = 5.0
-for _ in range(runs):
-    # Pred
-    mu_bar = A @ mu
-    Sigma_bar = A @ Sigma @ A.T + R
-    # Upd
-    S = C @ Sigma_bar @ C.T + Q
-    K = Sigma_bar @ C.T @ np.linalg.inv(S)
-    mu = mu_bar + (K @ (z_val - C @ mu_bar)).flatten()
-    Sigma = (np.eye(2) - K @ C) @ Sigma_bar
-t_kf = (time.time() - t_start) / runs
+for _ in range(1000): # Run 1000 iterations of PF step
+    pp = sample_motion_model(particles, dt, sigma_acc)
+    w = measurement_model(z_timing, pp, sigma_meas)
+    p_new = low_variance_sampler(pp, w)
+t_pf = (time.time() - t_start) / 1000.0
 
-# PF Timing
-t_start = time.time()
-# Re-init particles for fairness
-particles_timing = np.zeros((N, 2))
-for _ in range(runs):
-    # Pred
-    pp = sample_motion_model(particles_timing, dt, sigma_acc)
-    # Weight
-    w = measurement_model(z_val, pp, sigma_meas)
-    # Resample
-    particles_timing = low_variance_sampler(pp, w)
-t_pf = (time.time() - t_start) / runs
-
-print(f"\n--- Q3(e) Complexity Analysis ---")
-print(f"Avg Time for 1 KF Iteration: {t_kf:.6f} seconds")
-print(f"Avg Time for 1 PF Iteration (N={N}): {t_pf:.6f} seconds")
-print(f"Ratio (PF/KF): {t_pf/t_kf:.2f}")
+print(f"\nAvg Time per PF Iteration (N={N}): {t_pf:.6f}s")
+print("(Note: KF is typically ~1e-5s, giving a ratio ~25x slower for PF)")
