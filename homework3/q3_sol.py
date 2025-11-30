@@ -98,16 +98,23 @@ true_path = np.array(true_path)
 print("Generating Q3(c) Prediction Plots...")
 particles = np.zeros((N, 2)) # Init at 0,0
 
-fig_c, axes_c = plt.subplots(1, 5, figsize=(20, 5), sharey=True)
+fig_c, axes_c = plt.subplots(1, 5, figsize=(18, 6), sharey=True)
 fig_c.suptitle("Q3(c): Particle Filter Prediction (Phase Space Evolution)", fontsize=16)
+
+# Define 5 distinct base colors (from a colormap)
+cmap = plt.get_cmap('tab10')
+colors = [cmap(i) for i in range(5)]
 
 for t in range(5):
     # Motion Update
     particles = sample_motion_model(particles, dt, sigma_acc)
 
+    # Select base color for this time step
+    base_color = colors[t]
+
     # Plotting
     ax = axes_c[t]
-    ax.scatter(particles[:, 0], particles[:, 1], s=10, color='orange', alpha=0.5, label='Particles')
+    ax.scatter(particles[:, 0], particles[:, 1], s=10, color=base_color, alpha=0.5, label='Particles')
     ax.set_title(f"Time t={t+1}")
     ax.set_xlabel("Position (x)")
     if t == 0: ax.set_ylabel("Velocity (x_dot)")
@@ -129,8 +136,12 @@ print("Generating Q3(d) Update Plots...")
 # Reset particles
 particles = np.zeros((N, 2))
 
-fig_d, axes_d = plt.subplots(1, 5, figsize=(20, 5), sharey=True)
+fig_d, axes_d = plt.subplots(1, 5, figsize=(18, 6), sharey=True)
 fig_d.suptitle("Q3(d): Prediction vs Correction (Measurement Update)", fontsize=16)
+
+# Define 5 distinct base colors (from a colormap)
+cmap = plt.get_cmap('tab20')
+colors = [cmap(i) for i in range(10)]
 
 for t in range(5):
     z = measurements[t]
@@ -138,9 +149,20 @@ for t in range(5):
     # 1. Prediction (Prior)
     particles_bar = sample_motion_model(particles, dt, sigma_acc)
 
-    # Plot Prediction (Low Alpha, Red)
+    # Select colors for this time step
+    front_color = colors[2 * t]
+    back_color = colors[2 * t + 1]
+
+    # Plot Prediction (Low Alpha, same color)
     ax = axes_d[t]
-    ax.scatter(particles_bar[:, 0], particles_bar[:, 1], s=15, color='red', alpha=0.15, label='Prediction (Prior)')
+    ax.scatter(
+        particles_bar[:, 0],
+        particles_bar[:, 1],
+        s=15,
+        color=back_color,
+        alpha=0.4,
+        label='Prediction (Prior)' if t == 0 else None,
+    )
 
     # 2. Weighting
     weights = measurement_model(z, particles_bar, sigma_meas)
@@ -148,23 +170,40 @@ for t in range(5):
     # 3. Resampling (Posterior)
     particles = low_variance_sampler(particles_bar, weights)
 
-    # Plot Correction (High Alpha, Blue)
-    ax.scatter(particles[:, 0], particles[:, 1], s=15, color='blue', alpha=0.6, label='Correction (Posterior)')
+    # Plot Correction (High Alpha, same color)
+    ax.scatter(
+        particles[:, 0],
+        particles[:, 1],
+        s=15,
+        color=front_color,
+        alpha=0.8,
+        label='Correction (Posterior)' if t == 0 else None,
+    )
 
-    # Plot Measurement Line
-    ax.axvline(z, color='green', linestyle='--', linewidth=2, label=f'Meas z={z:.1f}')
+    # Plot Measurement Line (optional: only label once)
+    ax.axvline(
+        z,
+        color='green',
+        linestyle='--',
+        linewidth=2,
+        label=f'Meas z={z:.1f}' if t == 0 else None,
+    )
 
-    # Plot True State
-    ax.plot(true_path[t+1, 0], true_path[t+1, 1], 'k*', markersize=12, label='Truth')
+    # Plot True State (optional: only label once)
+    ax.plot(
+        true_path[t+1, 0],
+        true_path[t+1, 1],
+        'k*',
+        markersize=12,
+        label='Truth' if t == 0 else None,
+    )
 
     ax.set_title(f"t={t+1}")
     ax.set_xlabel("Position (x)")
-    if t == 0: ax.set_ylabel("Velocity (x_dot)")
-    ax.grid(True)
-
-    # Only add legend to the first plot to reduce clutter
     if t == 0:
+        ax.set_ylabel("Velocity (x_dot)")
         ax.legend(loc='upper left', fontsize='small')
+    ax.grid(True)
 
 plt.tight_layout()
 plt.savefig(outdir / 'q3_plot2.png', dpi=150)
