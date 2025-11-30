@@ -16,57 +16,49 @@ dt = 1.0
 sigma_acc = 1.0
 sigma_meas = np.sqrt(10)
 A = np.array([[1.0, dt], [0.0, 1.0]])
+N = 1000 # Number of particles
+
 # G is implicitly handled in the sampling step
 
 # --- Q3 (a) Functions ---
 
 def sample_motion_model(particles, dt, sigma_acc):
     """
-    Propagates particles forward in time.
-    x_t = A x_{t-1} + B u_t + noise
-    Here, noise enters via acceleration.
+    Propagates particles forward.
+    State: [position, velocity]
     """
-    N = particles.shape[0]
-    # Random accelerations for each particle
-    acc = np.random.normal(0, sigma_acc, N)
-
-    # Update rules:
-    # p_new = p + v*dt + 0.5*a*dt^2
-    # v_new = v + a*dt
+    num_p = particles.shape[0]
+    # Random acceleration for each particle
+    acc = np.random.normal(0, sigma_acc, num_p)
 
     p_old = particles[:, 0]
     v_old = particles[:, 1]
 
+    # Physics update
     p_new = p_old + v_old * dt + 0.5 * acc * dt**2
     v_new = v_old + acc * dt
 
-    new_particles = np.column_stack((p_new, v_new))
-    return new_particles
+    return np.column_stack((p_new, v_new))
 
 def measurement_model(z, particles, sigma_meas):
     """
-    Calculates weights based on likelihood P(z|x).
-    Likelihood is Gaussian centered at particle's position.
+    Calculates weights P(z|x).
     """
-    # Measurement z corresponds to position (particle[:, 0])
-    predicted_pos = particles[:, 0]
-
-    # Calculate Gaussian PDF value
-    weights = norm.pdf(z, loc=predicted_pos, scale=sigma_meas)
-
-    # Avoid division by zero (add epsilon)
+    pred_pos = particles[:, 0]
+    # Gaussian likelihood
+    weights = norm.pdf(z, loc=pred_pos, scale=sigma_meas)
+    # Avoid zero weights
     weights += 1.e-300
     return weights
 
 def low_variance_sampler(particles, weights):
     """
     Resamples particles based on weights.
-    Complexity O(M).
     """
     M = particles.shape[0]
     new_particles = np.zeros_like(particles)
 
-    # Normalize weights
+    # Normalize
     weights = weights / np.sum(weights)
 
     r = np.random.uniform(0, 1.0/M)
@@ -82,124 +74,142 @@ def low_variance_sampler(particles, weights):
 
     return new_particles
 
+# --- SIMULATION (Ground Truth) ---
+np.random.seed(42) # For reproducibility
+true_state = np.array([0.0, 0.0]) # x, x_dot
+measurements = []
+true_path = [true_state]
+
+for t in range(5):
+    acc = np.random.normal(0, sigma_acc)
+    # Update state
+    p_new = true_state[0] + true_state[1]*dt + 0.5*acc*dt**2
+    v_new = true_state[1] + acc*dt
+    true_state = np.array([p_new, v_new])
+    true_path.append(true_state)
+    # Generate noisy measurement
+    z = true_state[0] + np.random.normal(0, sigma_meas)
+    measurements.append(z)
+
+true_path = np.array(true_path)
+
 # --- Q3 (c) Particle Filter Prediction Only ---
-# Running just prediction for 5 steps, N=1000
-N = 1000
-particles = np.zeros((N, 2)) # Initialize at [0,0]
 
-# Visualization: Use subplots to avoid overlap
-fig, axes = plt.subplots(2, 3, figsize=(15, 8))
-fig.suptitle("Q3(c): PF Prediction Step Evolution (Phase Space)", fontsize=16)
-axes = axes.flatten()
+print("Generating Q3(c) Prediction Plots...")
+particles = np.zeros((N, 2)) # Init at 0,0
 
-# Plot t=0
-axes[0].plot(particles[:, 0], particles[:, 1], 'k.', alpha=0.2)
-axes[0].set_title("t=0 (Initial)")
-axes[0].set_xlabel("Position")
-axes[0].set_ylabel("Velocity")
-axes[0].grid(True)
+fig_c, axes_c = plt.subplots(1, 5, figsize=(20, 5), sharey=True)
+fig_c.suptitle("Q3(c): Particle Filter Prediction (Phase Space Evolution)", fontsize=16)
 
-for t in range(1, 6):
+for t in range(5):
+    # Motion Update
     particles = sample_motion_model(particles, dt, sigma_acc)
 
-    # Plot in subplot
-    ax = axes[t]
-    cmap = plt.get_cmap("viridis")
-    color = cmap(t/5)
-    ax.plot(particles[:, 0], particles[:, 1], '.', color=color, alpha=0.4, markersize=3)
-    ax.set_title(f"t={t}")
-    ax.set_xlabel("Position")
-    ax.set_ylabel("Velocity")
+    # Plotting
+    ax = axes_c[t]
+    ax.scatter(particles[:, 0], particles[:, 1], s=10, color='orange', alpha=0.5, label='Particles')
+    ax.set_title(f"Time t={t+1}")
+    ax.set_xlabel("Position (x)")
+    if t == 0: ax.set_ylabel("Velocity (x_dot)")
     ax.grid(True)
 
-    # Calculate and show statistics
-    mean_pos = np.mean(particles[:, 0])
-    var_pos = np.var(particles[:, 0])
-    ax.text(0.05, 0.9, f"Mean P: {mean_pos:.2f}\nVar P: {var_pos:.2f}",
-            transform=ax.transAxes, bbox=dict(facecolor='white', alpha=0.8))
+    # Add statistics for clarity
+    mean_pos = np.mean(particles[:,0])
+    mean_vel = np.mean(particles[:,1])
+    ax.legend(loc='upper left')
 
 plt.tight_layout()
 plt.savefig(outdir / 'q3_plot1.png', dpi=150)
 plt.show()
 
 
-# --- SIMULATION SETUP ---
-N = 1000
-# Generate the exact same ground truth trajectory as previous questions
-np.random.seed(42)
-true_state = np.array([0.0, 0.0])
-measurements = []
-true_positions = []
-for _ in range(5):
-    acc = np.random.normal(0, sigma_acc)
-    true_state = A @ true_state + np.array([0.5*dt**2, dt]) * acc
-    true_positions.append(true_state[0])
-    z = true_state[0] + np.random.normal(0, sigma_meas)
-    measurements.append(z)
+# --- Q3 (d)  Particle Filter with Updates ---
 
-# --- Q3 (d) and (c) Particle Filter with Updates ---
-
+print("Generating Q3(d) Update Plots...")
+# Reset particles
 particles = np.zeros((N, 2))
 
-# We will plot t=1, t=3, t=5 to show evolution clearly
-fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharey=True)
-fig.suptitle("Q3: Particle Filter Belief Evolution (Position Density)", fontsize=16)
+fig_d, axes_d = plt.subplots(1, 5, figsize=(20, 5), sharey=True)
+fig_d.suptitle("Q3(d): Prediction vs Correction (Measurement Update)", fontsize=16)
 
-plot_indices = [0, 2, 4] # indices for t=1, t=3, t=5 (0-based index)
+for t in range(5):
+    z = measurements[t]
 
-print("--- Particle Filter Evolution ---")
+    # 1. Prediction (Prior)
+    particles_bar = sample_motion_model(particles, dt, sigma_acc)
 
-for t, z in enumerate(measurements):
-    # 1. Prediction
-    particles_pred = sample_motion_model(particles, dt, sigma_acc)
+    # Plot Prediction (Low Alpha, Red)
+    ax = axes_d[t]
+    ax.scatter(particles_bar[:, 0], particles_bar[:, 1], s=15, color='red', alpha=0.15, label='Prediction (Prior)')
 
     # 2. Weighting
-    weights = measurement_model(z, particles_pred, sigma_meas)
+    weights = measurement_model(z, particles_bar, sigma_meas)
 
-    # 3. Resampling
-    particles = low_variance_sampler(particles_pred, weights)
+    # 3. Resampling (Posterior)
+    particles = low_variance_sampler(particles_bar, weights)
 
-    # Plotting Logic (mimicking book style densities)
-    if t in plot_indices:
-        ax_idx = plot_indices.index(t)
-        ax = axes[ax_idx]
+    # Plot Correction (High Alpha, Blue)
+    ax.scatter(particles[:, 0], particles[:, 1], s=15, color='blue', alpha=0.6, label='Correction (Posterior)')
 
-        # Plot Histogram of Position
-        ax.hist(particles[:, 0], bins=30, density=True, color='gray', alpha=0.6, label='Particles (Belief)')
+    # Plot Measurement Line
+    ax.axvline(z, color='green', linestyle='--', linewidth=2, label=f'Meas z={z:.1f}')
 
-        # Plot Gaussian of Measurement Likelihood (for reference)
-        # This helps show how the measurement "pulls" the particles
-        x_range = np.linspace(np.min(particles[:,0])-5, np.max(particles[:,0])+5, 100)
-        meas_likelihood = norm.pdf(x_range, loc=z, scale=sigma_meas)
-        ax.plot(x_range, meas_likelihood, 'r--', linewidth=2, label=f'Meas Model P(z={z:.1f}|x)')
+    # Plot True State
+    ax.plot(true_path[t+1, 0], true_path[t+1, 1], 'k*', markersize=12, label='Truth')
 
-        # Plot True Position
-        ax.axvline(true_positions[t], color='k', linestyle='-', linewidth=2, label='True Pos')
+    ax.set_title(f"t={t+1}")
+    ax.set_xlabel("Position (x)")
+    if t == 0: ax.set_ylabel("Velocity (x_dot)")
+    ax.grid(True)
 
-        ax.set_title(f"Time Step t={t+1}")
-        ax.set_xlabel("Position (x)")
-        if ax_idx == 0: ax.set_ylabel("Density")
+    # Only add legend to the first plot to reduce clutter
+    if t == 0:
         ax.legend(loc='upper left', fontsize='small')
 
-    # Statistics print
-    mean_p = np.mean(particles[:, 0])
-    print(f"t={t+1}: True Pos={true_positions[t]:.2f}, Particle Mean={mean_p:.2f}")
 plt.tight_layout()
 plt.savefig(outdir / 'q3_plot2.png', dpi=150)
 plt.show()
 
 # --- Q3 (e) Complexity Comparison ---
-# We will measure time for 1 iteration of KF vs PF (N=1000)
+# Re-measuring to match your requested output format
+print("\n--- Q3(e) Complexity Analysis (Recalculating) ---")
 
-# (Keeping previous logic for completeness)
-# Use a fixed measurement value to avoid referencing possibly unbound 'z'
-z_timing = measurements[-1] if measurements else 0.0
+# KF Timing
 t_start = time.time()
-for _ in range(1000): # Run 1000 iterations of PF step
-    pp = sample_motion_model(particles, dt, sigma_acc)
-    w = measurement_model(z_timing, pp, sigma_meas)
-    p_new = low_variance_sampler(pp, w)
-t_pf = (time.time() - t_start) / 1000.0
+runs = 1000
+# KF vars
+mu_kf = np.array([0., 0.])
+Sigma_kf = np.eye(2)
+Q_kf = np.array([[10]])
+C_kf = np.array([[1, 0]])
+G_kf = np.array([[0.5], [1]])
+R_kf = G_kf @ G_kf.T # simplified
+z_val = 5.0
 
-print(f"\nAvg Time per PF Iteration (N={N}): {t_pf:.6f}s")
-print("(Note: KF is typically ~1e-5s, giving a ratio ~25x slower for PF)")
+for _ in range(runs):
+    # Predict
+    mu_bar = A @ mu_kf
+    Sigma_bar = A @ Sigma_kf @ A.T + R_kf
+    # Update
+    S = C_kf @ Sigma_bar @ C_kf.T + Q_kf
+    K = Sigma_bar @ C_kf.T @ np.linalg.inv(S)
+    mu_kf = mu_bar + (K @ (z_val - C_kf @ mu_bar)).flatten()
+    Sigma_kf = (np.eye(2) - K @ C_kf) @ Sigma_bar
+t_kf = (time.time() - t_start) / runs
+
+# PF Timing
+t_start = time.time()
+# Reset PF
+parts_timed = np.zeros((N, 2))
+for _ in range(runs):
+    # Predict
+    pp = sample_motion_model(parts_timed, dt, sigma_acc)
+    # Weight
+    w = measurement_model(z_val, pp, sigma_meas)
+    # Resample
+    parts_timed = low_variance_sampler(pp, w)
+t_pf = (time.time() - t_start) / runs
+
+print(f"Avg Time for 1 KF Iteration: {t_kf:.6f} seconds")
+print(f"Avg Time for 1 PF Iteration (N={N}): {t_pf:.6f} seconds")
+print(f"Ratio (PF/KF): {t_pf/t_kf:.2f}")
