@@ -80,6 +80,7 @@ plt.ylabel("Position (x)")
 plt.xticks(time_steps)
 plt.grid(True)
 plt.legend()
+plt.savefig(outdir / 'q1_plot1.png', dpi=150)
 plt.show()
 
 # --- Q1 (d) & (e) KF Prediction Step ---
