@@ -1,7 +1,7 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess, SetEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
@@ -10,6 +10,18 @@ import shutil
 def generate_launch_description():
     pkg_vio = get_package_share_directory('vio_ekf')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
+
+    # Set GZ_SIM_RESOURCE_PATH so Gazebo can find our models
+    models_path = os.path.join(pkg_vio, 'models')
+    gz_resource_path = SetEnvironmentVariable(
+        name='GZ_SIM_RESOURCE_PATH',
+        value=models_path + ':' + os.environ.get('GZ_SIM_RESOURCE_PATH', '')
+    )
+    # Also set IGN_GAZEBO_RESOURCE_PATH for older Ignition versions
+    ign_resource_path = SetEnvironmentVariable(
+        name='IGN_GAZEBO_RESOURCE_PATH',
+        value=models_path + ':' + os.environ.get('IGN_GAZEBO_RESOURCE_PATH', '')
+    )
 
     # 1. Start Ignition Gazebo with our world
     sdf_path = os.path.join(pkg_vio, 'worlds', 'landmarks.sdf')
@@ -53,11 +65,13 @@ def generate_launch_description():
     )
 
     # 4. Static TF: world -> vio_robot (connects world to model root frame)
-    # The PosePublisher publishes vio_robot -> vio_robot/base_link, etc.
+    # Using --frame-id and --child-frame-id for proper static publisher
     tf_world_to_model = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', 'world', 'vio_robot'],
+        arguments=['--x', '0', '--y', '0', '--z', '0',
+                   '--roll', '0', '--pitch', '0', '--yaw', '0',
+                   '--frame-id', 'world', '--child-frame-id', 'vio_robot'],
         output='screen'
     )
 
@@ -71,6 +85,8 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        gz_resource_path,
+        ign_resource_path,
         gz_sim,
         bridge,
         ground_truth,
